@@ -1,0 +1,8 @@
+sqlalchemy
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+connexion
+connexion[swagger-ui]
+alembic
+psycopg2
