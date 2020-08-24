@@ -1,0 +1,324 @@
+openapi: '3.0.2'
+
+
+info:
+  title: Wx Files Service API
+  description: Get metadata and data for weather files.
+  version: '0.1'
+
+
+servers:
+  - url: http://localhost:5000
+    description: Local dev server
+  - url: https://services.pacificclimate.org/wx-files-service
+    description: Production server
+
+
+tags:
+  - name: Station
+    description: |
+      A named location where weather file information is available.
+  - name: File
+    description: |
+      A file containing weather information for a particular station.
+  - name: SummaryFile
+    description: |
+      A file containing a summary of weather data and
+      context and explanatory information about that data.
+  - name: WxFile
+    description: |
+      A weather file (not a summary).
+
+
+paths:
+  /stations:
+    get:
+      summary: List all available stations.
+      description: Get a list of metadata describing all available stations.
+      tags:
+        - Station
+      operationId: wxfs.api.stations.list
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                # Abstract this out as StationListResponse?
+                type: array
+                items:
+                  $ref: '#/components/schemas/StationResponse'
+
+  /stations/{id}:
+    get:
+      summary: Get metadata for a single station.
+      description: Get metadata for a single station.
+      tags:
+        - Station
+      operationId: wxfs.api.stations.get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Unique id of resource
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationResponse'
+        404:
+          $ref: '#/components/responses/404NotFound'
+
+  /files:
+    get:
+      summary: List metadata for all available weather files.
+      description: Get a list of metadata objects for all weather files.
+      tags:
+        - File
+      operationId: wxfs.api.files.list
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                # Abstract this out as FileListResponse?
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileResponse'
+
+  /files/{id}:
+    get:
+      summary: Get metadata for a single weather file.
+      description: Get metadata for a single weather file.
+      tags:
+        - File
+      operationId: wxfs.api.files.get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Unique id of resource
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileResponse'
+        404:
+          $ref: '#/components/responses/404NotFound'
+
+  /files/{id}/content:
+    get:
+      summary: Get content of a single weather file.
+      description: |
+        Get content of a single weather file. This is to be used for
+        downloading a weather file proper.
+      tags:
+        - File
+      operationId: wxfs.api.files.getContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Unique id of resource
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+        404:
+          $ref: '#/components/responses/404NotFound'
+
+
+components:
+  responses:
+    404NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: '404'
+            message: Resource not found
+
+  schemas:
+
+    # Response schemas
+
+    ErrorResponse:
+      description: Generic error response body
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+      example:
+        code: '404'
+        message: Message giving details of problem
+
+    StationResponse:
+      description: Response to a /stations request
+      allOf:
+        - $ref: '#/components/schemas/Station'
+        - type: object
+          properties:
+            files:
+              type: array
+              items:
+                $ref: '#/components/schemas/File'
+
+    FileResponse:
+      description: Response to a /files request
+      allOf:
+        - $ref: '#/components/schemas/File'
+        - type: object
+          properties:
+            station:
+              $ref: '#/components/schemas/Station'
+
+    # Component schemas. To avoid circularity, Station schemas contain no
+    # references to File schemas, and vice-versa. Response schemas
+    # are responsible for composing Station and File schemas as needed.
+
+    Station:
+      description: Metadata describing a station.
+      type: object
+      properties:
+        id:
+          description: Unique id of resource
+          type: string
+        selfUri:
+          description: URI for this resource
+          type: string
+          format: uri
+        name:
+          description: Station name
+          type: string
+        code:
+          description: Station code
+          type: string
+        latitude:
+          description: Latitude of station
+          type: number
+        longitude:
+          description: Longitude of station
+          type: number
+        elevation:
+          description: Elevation of station
+          type: number
+      required:
+        - id
+        - selfUri
+        - stationName
+        - stationCode
+        - latitude
+        - longitude
+        - elevation
+
+    File:
+      description: Metadata describing a file.
+      allOf:
+        - $ref: '#/components/schemas/FileCommon'
+        - oneOf:
+            - $ref: '#/components/schemas/WxFile'
+            - $ref: '#/components/schemas/SummaryFile'
+          discriminator:
+            propertyName: fileType
+
+    FileCommon:
+      description: Metadata common to all files.
+      type: object
+      properties:
+        id:
+          description: Unique id of resource
+          type: string
+        fileType:
+          type: string
+          enum: [summary, weather]
+        selfUri:
+          description: URI for this resource
+          type: string
+          format: uri
+        contentUri:
+          description: URI of weather file content for downloading.
+          type: string
+          format: uri
+      required:
+        - id
+        - fileType
+        - selfUri
+        - contentUri
+
+    WxFile:
+      description: Metadata specific to a weather file.
+      type: object
+      properties:
+        creationDate:
+          description: Weather file creation date
+          type: string
+          format: date-time
+        dataSource:
+          description: Source of data.
+          type: string
+        designDataType:
+          description: |
+            Type of summary (?) of weather data in this file:
+            - `TMY`: Typical meteorological year
+          type: string
+          enum: [TMY]  # To be extended.
+        scenario:
+          description: |
+            RCP (represenatative concentration pathway) in model(s) used to
+            generate this file.
+          type: string
+          enum: ["RCP2.6", "RCP4.5", "RCP8.5"]
+        timePeriod:
+          description: |
+            Center year of climatological time period of projected values.
+          type: integer
+          enum: [2020, 2050, 2080]
+        ensembleStatistic:
+          description: |
+            Statistic over ensemble used to generate this data.
+          type: string
+          enum: [median]
+        variables:
+          description: |
+            Specifies variables (e.g., temperature) and "smoothing" applied
+            to them in this file.
+          type: string
+          enum:
+            - T annual anomaly
+            - T seasonal anomaly
+            - T 21-day smoothing
+            - All variables 21-day smoothing  # ? Maybe?
+      required:  # All
+        - creationDate
+        - dataSource
+        - summaryType
+        - scenario
+        - timePeriod
+        - projection
+        - variables
+
+    SummaryFile:
+      description: Metadata specific to a summary file
+      type: object
+      properties: {}
