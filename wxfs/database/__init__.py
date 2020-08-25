@@ -25,6 +25,7 @@ class Station(Base):
 
 class File(Base):
     """Base type for polymorphic file objects. """
+    __tablename__ = "files"
     id = Column('file_id', Integer, primary_key=True, nullable=False)
     # Discriminator for polymorphic type
     fileType = Column(
@@ -42,26 +43,39 @@ class SummaryFile(File):
     fileType == "summary"
     There are no additional attributes for this object.
     """
-    pass
+    __tablename__ = "summary_files"
+    id = Column(
+        'summary_file_id',
+        Integer,
+        ForeignKey('files.file_id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False
+    )
 
 
 class WxFile(File):
     """A weather file contains weather information for a particular station.
     fileType == "weather"
     """
+    __tablename__ = "wx_files"
+    id = Column(
+        'wx_file_id',
+        Integer,
+        ForeignKey('files.file_id', ondelete='CASCADE'),
+        primary_key=True,
+        nullable=False
+    )
     creationDate = Column(DateTime, nullable=False)  # nullable?
     dataSource = Column(String(1024), nullable=False)
     designDataType = Column(
-        Enum("TMY"),
+        Enum("TMY", "XMY", "TSY", "AMY", "design day"),
         nullable=False
     )
     scenario = Column(
         Enum("RCP2.6", "RCP4.5", "RCP8.5"),
         nullable=False
     )
-    timePeriod = Column(
-
-    )
+    timePeriodCentre = Column(Numeric, nullable=False)
     ensembleStatistic = Column(
         Enum("average", "median", "10th percentile", "90th percentile"),
         nullable=False
