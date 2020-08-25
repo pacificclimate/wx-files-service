@@ -10,8 +10,11 @@ the existing collection of weather files now at PCIC.
 
 import os
 import logging
+import re
 
 from wxfs.database import (Station, WxFile, SummaryFile)
+from wxfs.indexer.file_parsing import get_wx_file_info
+from wxfs.indexer.db_helpers import find_or_insert
 
 
 # Set up logging
@@ -88,6 +91,8 @@ def index_station(sesh, filepath):
             logger.warning("Shit, stations aren't all the same.")
         if summary_filepath is not None:
             files.append(index_summary_file(sesh, station, summary_filepath))
+    else:
+        logger.info(f"{filepath} does not contain any weather files")
 
     return files
 
@@ -106,28 +111,14 @@ def index_wx_file(sesh, filepath):
     logger.info(f"Indexing weather file {filepath}")
     check_extension(filepath, ".epw")
     with open(filepath, "r") as file:
-        info = get_wx_file_info(file)
-        station = find_or_insert(sesh, Station, info["station"])
+        station_info, wx_file_info = get_wx_file_info(file)
+        station = find_or_insert(sesh, Station, station_info)
         wx_file = find_or_insert(sesh, WxFile, {
-            **info["wx_file"],
+            # TODO: Possibly some fixed values here
+            **wx_file_info,
             "station_id": station.id,
         })
         return wx_file
-
-
-def get_wx_file_info(wx_file):
-    """Parse a weather file (.epw) and return essential info, namely the information
-    that characterizes its station and the weather file data.
-    """
-    # TODO !!
-    return {
-        "station": {
-
-        },
-        "wx_file": {
-
-        },
-    }
 
 
 def index_summary_file(sesh, station, filepath):
@@ -155,25 +146,4 @@ def check_extension(filepath, extension):
     name, ext = os.path.splitext(filepath)
     if ext != extension:
         raise ValueError(f"File {filepath} does not have extension '{extension}'.")
-
-
-# Database utility functions
-
-def find(sesh, Thing, attributes):
-    """Find an existing database Thing matching the given attributes."""
-    query = sesh.query(Thing).filter(**attributes)
-    return query.first()
-
-
-def insert(sesh, Thing, attributes):
-    """Insert a new database Thing with given attributes."""
-    thing = Thing(**attributes)
-    sesh.add(thing)
-    return thing
-
-
-def find_or_insert(sesh, Thing, attributes):
-    """Find or insert a database Thing with given attributes."""
-    return find(sesh, Thing, attributes) or insert(sesh, Thing, attributes)
-
 
