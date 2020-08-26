@@ -1,10 +1,10 @@
 """ORM for the Wx Files database.
 
 """
-# TODO: Relationships
 # TODO: Datetime of indexing? Do we care?
 
 from sqlalchemy import (Column, DateTime, Enum, Integer, String, Numeric, ForeignKey)
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -35,6 +35,7 @@ class File(Base):
     filepath = Column(String(2048), nullable=False)
     # Relationships
     station_id = Column(Integer, ForeignKey('stations.station_id'))
+    station = relationship("Station")
 
 
 class SummaryFile(File):
