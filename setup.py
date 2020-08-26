@@ -1,6 +1,5 @@
 import sys
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
 __version__ = (0, 1, 0)
 
@@ -14,7 +13,7 @@ setup(
     author="Rod Glover",
     author_email="rglover@uvic.ca",
     install_requires=""" 
-        python-dateutil,
+        python-dateutil
         Flask
         Flask-Cors
         Flask-SQLAlchemy
@@ -22,7 +21,7 @@ setup(
         connexion[swagger-ui]
         alembic
         psycopg2
-    """.split(),
+    """.split("\n"),
     zip_safe=True,
     include_package_data=True,
     tests_require=['pytest', 'testing.postgresql'],
