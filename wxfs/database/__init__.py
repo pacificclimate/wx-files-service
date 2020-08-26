@@ -29,7 +29,7 @@ class File(Base):
     id = Column('file_id', Integer, primary_key=True, nullable=False)
     # Discriminator for polymorphic type
     fileType = Column(
-        Enum("summary", "weather"),
+        Enum("summary", "weather", name="fileType"),
         nullable=False
     )
     filepath = Column(String(2048), nullable=False)
@@ -68,16 +68,25 @@ class WxFile(File):
     creationDate = Column(DateTime, nullable=False)  # nullable?
     dataSource = Column(String(1024), nullable=False)
     designDataType = Column(
-        Enum("TMY", "XMY", "TSY", "AMY", "design day"),
+        Enum(
+            "TMY", "XMY", "TSY", "AMY", "design day",
+            name="designDataType"
+        ),
         nullable=False
     )
     scenario = Column(
-        Enum("RCP2.6", "RCP4.5", "RCP8.5"),
+        Enum(
+            "RCP2.6", "RCP4.5", "RCP8.5",
+            name="scenario"
+        ),
         nullable=False
     )
     timePeriodCentre = Column(Numeric, nullable=False)
     ensembleStatistic = Column(
-        Enum("average", "median", "10th percentile", "90th percentile"),
+        Enum(
+            "average", "median", "10th percentile", "90th percentile",
+            name="ensembleStatistic"
+        ),
         nullable=False
     )
 
