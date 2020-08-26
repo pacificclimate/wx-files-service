@@ -8,7 +8,7 @@ def test_make_wx_file(
     year, city, code, lon, lat, elev,
     make_wx_file
 ):
-    with make_wx_file(year, city, code, lon, lat, elev) as wx_file:
+    with open(make_wx_file(year, city, code, lon, lat, elev), "r") as wx_file:
         print("\n", wx_file.name)
         print(wx_file.readline())
         assert str(year) in wx_file.name

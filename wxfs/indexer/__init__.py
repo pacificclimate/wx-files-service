@@ -112,11 +112,15 @@ def index_wx_file(sesh, filepath):
     check_extension(filepath, ".epw")
     with open(filepath, "r") as file:
         station_info, wx_file_info = get_wx_file_info(file)
-        station = find_or_insert(sesh, Station, station_info)
+        station = find_or_insert(sesh, Station, {
+            **station_info,
+        })
         wx_file = find_or_insert(sesh, WxFile, {
             # TODO: Possibly some fixed values here
+            "fileType": "weather",
             **wx_file_info,
-            "station_id": station.id,
+            "station": station,
+            "filepath": filepath,
         })
         return wx_file
 

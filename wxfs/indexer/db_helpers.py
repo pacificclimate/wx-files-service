@@ -2,7 +2,7 @@
 
 def find(sesh, Thing, attributes):
     """Find an existing database Thing matching the given attributes."""
-    query = sesh.query(Thing).filter(**attributes)
+    query = sesh.query(Thing).filter_by(**attributes)
     return query.first()
 
 

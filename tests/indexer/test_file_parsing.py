@@ -13,7 +13,7 @@ from wxfs.indexer.file_parsing import (
     (2050, "Elsewhere", "11111", 51.1, -125.2, 1000.0),
 ])
 def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
-    with make_wx_file(year, city, code, lon, lat, elev) as wx_file:
+    with open(make_wx_file(year, city, code, lon, lat, elev), "r") as wx_file:
         station_info, wx_file_info = get_wx_file_info(wx_file)
     assert station_info == {
         "name": f"{city},BC,CAN",
