@@ -13,6 +13,12 @@ def insert(sesh, Thing, attributes):
     return thing
 
 
-def find_or_insert(sesh, Thing, attributes):
-    """Find or insert a database Thing with given attributes."""
-    return find(sesh, Thing, attributes) or insert(sesh, Thing, attributes)
+def find_or_insert(sesh, Thing, find_attrs, insert_attrs):
+    """Find or insert a database Thing with given attributes.
+    Since the attributes for finding are typically a subset of those for inserting,
+    the two sets of attributes are separate arguments, merged for insert.
+    """
+    return (
+        find(sesh, Thing, find_attrs) or
+        insert(sesh, Thing, {**find_attrs, **insert_attrs})
+    )

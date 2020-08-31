@@ -106,22 +106,25 @@ def index_wx_file(sesh, filepath):
 
     :param sesh: SQLAlchemy session for a Wx Files database.
     :param filepath: Filepath of weather file to index.
-    :return:
+    :return: WxFile ORM object
     """
     logger.info(f"Indexing weather file {filepath}")
     check_extension(filepath, ".epw")
     with open(filepath, "r") as file:
         station_info, wx_file_info = get_wx_file_info(file)
-        station = find_or_insert(sesh, Station, {
-            **station_info,
-        })
-        wx_file = find_or_insert(sesh, WxFile, {
-            # TODO: Possibly some fixed values here
-            "fileType": "weather",
-            **wx_file_info,
-            "station": station,
-            "filepath": filepath,
-        })
+        station = find_or_insert(sesh, Station, station_info, {})
+        wx_file = find_or_insert(
+            sesh,
+            WxFile,
+            {
+                "fileType": "weather",
+                **wx_file_info,
+                "station": station,
+            },
+            {
+                "filepath": filepath,
+            }
+        )
         return wx_file
 
 
@@ -138,10 +141,16 @@ def index_summary_file(sesh, station, filepath):
     """
     logger.info(f"Indexing summary file {filepath}")
     check_extension(filepath, ".xslx")
-    summary_file = find_or_insert(sesh, SummaryFile, {
-        "station_id": station.id,
-        "filepath": filepath,
-    })
+    summary_file = find_or_insert(
+        sesh,
+        SummaryFile,
+        {
+            "station": station,
+        },
+        {
+            "filepath": filepath,
+        }
+    )
     return summary_file
 
 
