@@ -208,8 +208,17 @@ components:
           description: URI for this resource
           type: string
           format: uri
-        name:
-          description: Station name
+        title:
+          description: Station "title", standard EPW item
+          type: string
+        city:
+          description: Station title, city component (if parseable)
+          type: string
+        province:
+          description: Station title, province component (if parseable)
+          type: string
+        country:
+          description: Station title, country component (if parseable)
           type: string
         code:
           description: Station code
@@ -289,26 +298,42 @@ components:
             generate this file.
           type: string
           enum: ["RCP2.6", "RCP4.5", "RCP8.5"]
-        timePeriod:
-          description: |
-            Center year of climatological time period of projected values.
+        timePeriodStart:
+          description: Start year of climatological time period of projected values.
           type: integer
-          enum: [2020, 2050, 2080]
+        timePeriodEnd:
+          description: End year of climatological time period of projected values.
+          type: integer
         ensembleStatistic:
           description: |
             Statistic over ensemble used to generate this data.
           type: string
           enum: [median]
         variables:
-          description: |
-            Specifies variables (e.g., temperature) and "smoothing" applied
-            to them in this file.
+          description: Variables (e.g., temperature) in this file.
           type: string
           enum:
-            - T annual anomaly
-            - T seasonal anomaly
-            - T 21-day smoothing
-            - All variables 21-day smoothing  # ? Maybe?
+            - T
+            - all thermodynamic
+            - all
+        anomaly:
+          description: Type of anomaly.
+          type: string
+          enum:
+            - daily
+            - seasonal
+            - annual
+        smoothing:
+          description: Smoothing applied to variable anomaly.
+          # TODO: Consider whether this would be better represented as
+          #  a nullable integer value
+          type: string
+          enum:
+            - none
+            - 1
+            - 5
+            - 11
+            - 21
       required:  # All
         - creationDate
         - dataSource
@@ -317,6 +342,8 @@ components:
         - timePeriod
         - projection
         - variables
+        - anomaly
+        - smoothing
 
     SummaryFile:
       description: Metadata specific to a summary file
