@@ -82,7 +82,8 @@ class WxFile(File):
         ),
         nullable=False
     )
-    timePeriodCentre = Column(Numeric, nullable=False)
+    timePeriodStart = Column(Numeric, nullable=False)
+    timePeriodEnd = Column(Numeric, nullable=False)
     ensembleStatistic = Column(
         Enum(
             "average", "median", "10th percentile", "90th percentile",
