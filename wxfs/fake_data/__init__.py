@@ -5,9 +5,9 @@ def makeFileCommon():
     global fileId
     fileId += 1
     return {
-        "id": f"${fileId}",
-        "selfUri": f"/files/${fileId}",
-        "contentUri": f"/files/${fileId}/content",
+        "id": f"{fileId}",
+        "selfUri": f"/files/{fileId}",
+        "contentUri": f"/files/{fileId}/content",
     }
 
 
@@ -49,17 +49,17 @@ def makeLocation(
     global locationId
     locationId += 1
     return {
-        "id": f"${locationId}",
-        "selfUri": f"/locations/${locationId}",
-         "name": f"${city},${province},${country}",
-         "city": city,
-         "province": province,
-         "country": country,
-         "code": code,
-         "latitude": latitude,
-         "longitude": longitude,
-         "elevation": elevation,
-         "files": [
+        "id": f"{locationId}",
+        "selfUri": f"/locations/{locationId}",
+        "name": f"{city},{province},{country}",
+        "city": city,
+        "province": province,
+        "country": country,
+        "code": code,
+        "latitude": latitude,
+        "longitude": longitude,
+        "elevation": elevation,
+        "files": [
             makeWxFile("2010-01-01", "2039-12-31"),
             makeWxFile("2040-01-01", "2069-12-31"),
             makeWxFile("2070-01-01", "2099-12-31"),

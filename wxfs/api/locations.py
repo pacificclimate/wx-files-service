@@ -1,6 +1,9 @@
+from wxfs.fake_data import locations
+
+
 def listing():
-    return []
+    return locations
 
 
-def get():
-    return {}
+def get(id=None):
+    return locations[id]
