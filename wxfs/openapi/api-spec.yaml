@@ -15,12 +15,12 @@ servers:
 
 
 tags:
-  - name: Station
+  - name: Location
     description: |
       A named location where weather file information is available.
   - name: File
     description: |
-      A file containing weather information for a particular station.
+      A file containing weather information for a particular location.
   - name: SummaryFile
     description: |
       A file containing a summary of weather data and
@@ -31,13 +31,13 @@ tags:
 
 
 paths:
-  /stations:
+  /locations:
     get:
-      summary: List all available stations.
-      description: Get a list of metadata describing all available stations.
+      summary: List all available locations.
+      description: Get a list of metadata describing all available locations.
       tags:
-        - Station
-      operationId: wxfs.api.stations.list
+        - Location
+      operationId: wxfs.api.locations.listing
       responses:
         200:
           description: Success
@@ -49,13 +49,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/StationResponse'
 
-  /stations/{id}:
+  /locations/{id}:
     get:
-      summary: Get metadata for a single station.
-      description: Get metadata for a single station.
+      summary: Get metadata for a single location.
+      description: Get metadata for a single location.
       tags:
-        - Station
-      operationId: wxfs.api.stations.get
+        - Location
+      operationId: wxfs.api.locations.get
       parameters:
         - name: id
           in: path
@@ -79,7 +79,7 @@ paths:
       description: Get a list of metadata objects for all weather files.
       tags:
         - File
-      operationId: wxfs.api.files.list
+      operationId: wxfs.api.files.listing
       responses:
         200:
           description: Success
@@ -174,9 +174,9 @@ components:
         message: Message giving details of problem
 
     StationResponse:
-      description: Response to a /stations request
+      description: Response to a /locations request
       allOf:
-        - $ref: '#/components/schemas/Station'
+        - $ref: '#/components/schemas/Location'
         - type: object
           properties:
             files:
@@ -190,15 +190,15 @@ components:
         - $ref: '#/components/schemas/File'
         - type: object
           properties:
-            station:
-              $ref: '#/components/schemas/Station'
+            location:
+              $ref: '#/components/schemas/Location'
 
-    # Component schemas. To avoid circularity, Station schemas contain no
+    # Component schemas. To avoid circularity, Location schemas contain no
     # references to File schemas, and vice-versa. Response schemas
-    # are responsible for composing Station and File schemas as needed.
+    # are responsible for composing Location and File schemas as needed.
 
-    Station:
-      description: Metadata describing a station.
+    Location:
+      description: Metadata describing a location.
       type: object
       properties:
         id:
@@ -209,34 +209,41 @@ components:
           type: string
           format: uri
         title:
-          description: Station "title", standard EPW item
+          description: Location "title", standard EPW item
+          type: string
+        name:
+          description: Location name formed from city, province, country
           type: string
         city:
-          description: Station title, city component (if parseable)
+          description: Location title, city component (if parseable)
           type: string
         province:
-          description: Station title, province component (if parseable)
+          description: Location title, province component (if parseable)
           type: string
         country:
-          description: Station title, country component (if parseable)
+          description: Location title, country component (if parseable)
           type: string
         code:
-          description: Station code
+          description: Location code (typically a 7-digit number)
           type: string
         latitude:
-          description: Latitude of station
+          description: Latitude of location
           type: number
         longitude:
-          description: Longitude of station
+          description: Longitude of location
           type: number
         elevation:
-          description: Elevation of station
+          description: Elevation of location
           type: number
       required:
         - id
         - selfUri
-        - stationName
-        - stationCode
+        - title
+        - name
+        - city
+        - province
+        - country
+        - code
         - latitude
         - longitude
         - elevation
@@ -298,12 +305,8 @@ components:
             generate this file.
           type: string
           enum: ["RCP2.6", "RCP4.5", "RCP8.5"]
-        timePeriodStart:
-          description: Start year of climatological time period of projected values.
-          type: integer
-        timePeriodEnd:
-          description: End year of climatological time period of projected values.
-          type: integer
+        timePeriod:
+          $ref: '#/components/schemas/TimePeriod'
         ensembleStatistic:
           description: |
             Statistic over ensemble used to generate this data.
@@ -337,10 +340,10 @@ components:
       required:  # All
         - creationDate
         - dataSource
-        - summaryType
+        - designDataType
         - scenario
         - timePeriod
-        - projection
+        - ensembleStatistic
         - variables
         - anomaly
         - smoothing
@@ -349,3 +352,14 @@ components:
       description: Metadata specific to a summary file
       type: object
       properties: {}
+
+    TimePeriod:
+      description: Metadata describing a file's (climatological) time period
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time

@@ -13,6 +13,38 @@ This microservice provides
 
 ## Installation
 
+It is best practice to install using a virtual environment.
+Current recommended practice for Python3.3+ to use the 
+[builtin `venv` module](https://docs.python.org/3/library/venv.html).
+(Alternatively, `virtualenv` can still be used but it has shortcomings 
+that are corrected in `venv`.)
+See 
+[Creating Virtual Environments](https://packaging.python.org/installing/#creating-virtual-environments) for an
+overview of these tools.
+
+```bash
+$ git clone https://github.com/pacificclimate/wx-files-service
+$ cd wx-files-service
+$ python3 -m venv venv
+$ source venv/bin/activate
+(venv)$ pip install -U pip
+(venv)$ pip install -i https://pypi.pacificclimate.org/simple/ \
+    -r requirements.txt -r test_requirements.txt
+(venv)$ pip install -e .
+```
+
+## Run the service
+
+To run a dev server locally:
+
+```bash
+source venv/bin/activate
+export FLASK_APP=wxfs.wsgi
+export FLASK_ENV=development
+flask run
+```
+
+
 ## API design
 
 ### Data model
