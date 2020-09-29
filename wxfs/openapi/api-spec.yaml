@@ -268,6 +268,9 @@ components:
         fileType:
           type: string
           enum: [summary, weather]
+        filepath:
+          description: Filepath in storage to file contents
+          type: string
         selfUri:
           description: URI for this resource
           type: string
@@ -279,6 +282,7 @@ components:
       required:
         - id
         - fileType
+        - filepath
         - selfUri
         - contentUri
 
@@ -298,7 +302,7 @@ components:
             Type of summary (?) of weather data in this file:
             - `TMY`: Typical meteorological year
           type: string
-          enum: [TMY]  # To be extended.
+          enum: ["TMY", "XMY", "TSY", "AMY", "design day"]  # To be extended.
         scenario:
           description: |
             RCP (represenatative concentration pathway) in model(s) used to
@@ -311,7 +315,7 @@ components:
           description: |
             Statistic over ensemble used to generate this data.
           type: string
-          enum: [median]
+          enum: ["average", "median", "10th percentile", "90th percentile"]
         variables:
           description: Variables (e.g., temperature) in this file.
           type: string
