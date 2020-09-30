@@ -1,0 +1,14 @@
+version: '2.3'
+services:
+  database:
+    image: docker-registry01.pcic.uvic.ca:5000/pcic/postgres_10.5_en_ca:latest
+    container_name: "wxfs-db"
+    ports:
+      - "30599:5432"
+    volumes:
+      - type: bind
+        source: "/home/rglover/code/wx-files-service/wxfs/database/demo/setup01"
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+    env_file:
+      - wxfs-db.env
