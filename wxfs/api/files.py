@@ -1,5 +1,5 @@
-from flask import url_for
-from wxfs.database import WxFile, SummaryFile
+from flask import url_for, send_file
+from wxfs.database import File
 from wxfs import get_app_session
 
 
@@ -59,33 +59,29 @@ def collection_rep(files):
 
 
 def listing():
-    session = get_app_session()
-    # TODO: Find out if there is a way to query on File only and
-    #  extend appropriately according to discriminator
-    wx_files = (
-        session
-            .query(WxFile)
-            .order_by(WxFile.id.asc())
+    files = (
+        get_app_session()
+            .query(File)
+            .order_by(File.id.asc())
             .all()
     )
-    summary_files = (
-        session
-            .query(SummaryFile)
-            .order_by(SummaryFile.id.asc())
-            .all()
-    )
-    return collection_rep(wx_files + summary_files)
+    return collection_rep(files)
 
 
-def get(id):
-    file = (
+def get_file_by_id(id):
+    return (
         get_app_session()
             .query(File)
             .filter_by(id=id)
             .one()
     )
+
+
+def get(id):
+    file = get_file_by_id(id)
     return single_item_rep(file)
 
 
-def getContent():
-    return {}
+def getContent(id):
+    file = get_file_by_id(id)
+    return send_file(file.filepath, as_attachment=True)
