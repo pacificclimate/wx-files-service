@@ -16,10 +16,9 @@ class Location(Base):
     """A location is a location for which there are files."""
     __tablename__ = "locations"
     id = Column('location_id', Integer, primary_key=True, nullable=False)
-    name = Column(String(256), nullable=False)
     city = Column(String(128), nullable=False)
     province = Column(String(2), nullable=False)
-    country = Column(String(2), nullable=False)
+    country = Column(String(64), nullable=False)
     code = Column(String(64), nullable=False)
     longitude = Column(Numeric, nullable=False)
     latitude = Column(Numeric, nullable=False)
@@ -102,4 +101,4 @@ class WxFile(File):
         ),
         nullable=False,
     )
-    smoothing = Column(Integer, nullable=False)
+    smoothing = Column(Integer, nullable=True)
