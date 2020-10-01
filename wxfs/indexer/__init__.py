@@ -12,7 +12,7 @@ import os
 import logging
 import re
 
-from wxfs.database import (Station, WxFile, SummaryFile)
+from wxfs.database import (Location, WxFile, SummaryFile)
 from wxfs.indexer.file_parsing import get_wx_file_info
 from wxfs.indexer.db_helpers import find_or_insert
 
@@ -37,34 +37,34 @@ summary_file_extension = ".xslx"
 
 # Indexing functions
 
-def index_station_collection(sesh, filepath):
+def index_location_collection(sesh, filepath):
     """
-    Index a collection of station subdirectories in directory `filepath`.
+    Index a collection of location subdirectories in directory `filepath`.
 
     :param sesh: SQLAlchemy session for a Wx Files database.
     :param filepath: Filepath to root directory.
     :return:
     """
-    logger.info(f"Indexing station collection at {filepath}")
+    logger.info(f"Indexing location collection at {filepath}")
     for entry in os.scandir(filepath):
         if entry.is_dir():
             # Should this really yield?
-            yield index_station(sesh, entry.path)
+            yield index_location(sesh, entry.path)
 
 
-def index_station(sesh, filepath):
+def index_location(sesh, filepath):
     """
-    Index a single station, defined by the files in station directory at `filepath`.
+    Index a single location, defined by the files in location directory at `filepath`.
 
-    A directory is a station directory if it contains at least one file with extension
+    A directory is a location directory if it contains at least one file with extension
     ".epw".
 
     :param sesh: SQLAlchemy session for a Wx Files database.
-    :param filepath: Filepath of a station directory.
+    :param filepath: Filepath of a location directory.
     :return: list of Wx Files database file objects.
     """
 
-    logger.info(f"Indexing station at {filepath}")
+    logger.info(f"Indexing location at {filepath}")
 
     # We assume there are few (relevant) files in each directory, so that accumulating
     # all their paths is no big deal.
@@ -85,12 +85,12 @@ def index_station(sesh, filepath):
     files = [index_wx_file(sesh, filepath) for filepath in wx_filepaths]
 
     if len(files) > 0:
-        station = files[0].station
-        if not all(file.station == station for file in files):
+        location = files[0].location
+        if not all(file.location == location for file in files):
             # Does this need to be pre-checked before doing any database activities?
-            logger.warning("Shit, stations aren't all the same.")
+            logger.warning("Shit, locations aren't all the same.")
         if summary_filepath is not None:
-            files.append(index_summary_file(sesh, station, summary_filepath))
+            files.append(index_summary_file(sesh, location, summary_filepath))
     else:
         logger.info(f"{filepath} does not contain any weather files")
 
@@ -100,8 +100,8 @@ def index_station(sesh, filepath):
 def index_wx_file(sesh, filepath):
     """Index a weather file into the database.
 
-    A weather file contains all information necessary to determine both its station
-    and its content metadata. If a matching Station is not found in the database,
+    A weather file contains all information necessary to determine both its location
+    and its content metadata. If a matching Location is not found in the database,
     one is created. If a matching WxFile is not found in the database, one is created.
 
     :param sesh: SQLAlchemy session for a Wx Files database.
@@ -111,15 +111,15 @@ def index_wx_file(sesh, filepath):
     logger.info(f"Indexing weather file {filepath}")
     check_extension(filepath, ".epw")
     with open(filepath, "r") as file:
-        station_info, wx_file_info = get_wx_file_info(file)
-        station = find_or_insert(sesh, Station, station_info, {})
+        location_info, wx_file_info = get_wx_file_info(file)
+        location = find_or_insert(sesh, Location, location_info, {})
         wx_file = find_or_insert(
             sesh,
             WxFile,
             {
                 "fileType": "weather",
                 **wx_file_info,
-                "station": station,
+                "location": location,
             },
             {
                 "filepath": filepath,
@@ -128,13 +128,13 @@ def index_wx_file(sesh, filepath):
         return wx_file
 
 
-def index_summary_file(sesh, station, filepath):
+def index_summary_file(sesh, location, filepath):
     """Index a summary file into the database.
 
-    A summary file does not contain enough information to determine its station,
+    A summary file does not contain enough information to determine its location,
     so one must be provided externally. Actually, this might not be true, depending
-    on how reliable and unique the station code is. For now, we will determine
-    station externally.
+    on how reliable and unique the location code is. For now, we will determine
+    location externally.
 
     Also, a summary file doesn't have any metadata we need to extract, so inserting
     it is simple. But see note above.
@@ -145,7 +145,7 @@ def index_summary_file(sesh, station, filepath):
         sesh,
         SummaryFile,
         {
-            "station": station,
+            "location": location,
         },
         {
             "filepath": filepath,

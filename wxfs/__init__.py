@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 # But at least the clients of this module (are supposed to) use
 # `get_app_session()` instead of importing these globals directly.
 # It would be better to hide these globals inside a singleton class, but that
-# would take more time than I am willing to spend for an essentially isomorphic
+# would take more effort than I am willing to spend for an essentially isomorphic
 # solution.
 #
 # Note: Clients (API functions) *must* use `get_app_session()`. If instead they
@@ -27,16 +27,15 @@ def create_app(config_override = {}):
     flask_app = connexion_app.app
     CORS(flask_app)
 
-    # TODO: Fix for wx files index database
-    # flask_app.config.from_mapping(
-    #     SQLALCHEMY_DATABASE_URI=
-    #     os.getenv('PCDS_DSN', 'postgresql://httpd@db3.pcic.uvic.ca/crmp'),
-    #     SQLALCHEMY_TRACK_MODIFICATIONS=False,
-    #     SQLALCHEMY_ECHO=False,
-    # )
-    # flask_app.config.update(config_override)
-    #
-    # app_db = SQLAlchemy(flask_app)
+    flask_app.config.from_mapping(
+        SQLALCHEMY_DATABASE_URI=
+        os.getenv('WXFS_DSN', ''),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        SQLALCHEMY_ECHO=False,
+    )
+    flask_app.config.update(config_override)
+
+    app_db = SQLAlchemy(flask_app)
 
     # Must establish database before adding API spec(s). API specs refer to
     # handlers (`operationId`), which in turn import the database.

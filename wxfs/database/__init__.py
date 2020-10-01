@@ -12,11 +12,13 @@ Base = declarative_base()
 metadata = Base.metadata
 
 
-class Station(Base):
-    """A station is a location for which there are files."""
-    __tablename__ = "stations"
-    id = Column('station_id', Integer, primary_key=True, nullable=False)
-    name = Column(String(256), nullable=False)
+class Location(Base):
+    """A location is a location for which there are files."""
+    __tablename__ = "locations"
+    id = Column('location_id', Integer, primary_key=True, nullable=False)
+    city = Column(String(128), nullable=False)
+    province = Column(String(2), nullable=False)
+    country = Column(String(64), nullable=False)
     code = Column(String(64), nullable=False)
     longitude = Column(Numeric, nullable=False)
     latitude = Column(Numeric, nullable=False)
@@ -33,9 +35,9 @@ class File(Base):
         nullable=False
     )
     filepath = Column(String(2048), nullable=False)
+
     # Relationships
-    station_id = Column(Integer, ForeignKey('stations.station_id'))
-    station = relationship("Station")
+    location_id = Column(Integer, ForeignKey('locations.location_id'))
 
 
 class SummaryFile(File):
@@ -52,10 +54,15 @@ class SummaryFile(File):
         primary_key=True,
         nullable=False
     )
+    # TODO: Add attributes scenario, ensembleStatistic(s), timePeriod(s), variables.
+    #  These should be raised up to File where appropriate (scenario, variables, ...).
+
+    # Relationships
+    location = relationship("Location", backref="summary_files")
 
 
 class WxFile(File):
-    """A weather file contains weather information for a particular station.
+    """A weather file contains weather information for a particular location.
     fileType == "weather"
     """
     __tablename__ = "wx_files"
@@ -82,8 +89,8 @@ class WxFile(File):
         ),
         nullable=False
     )
-    timePeriodStart = Column(Numeric, nullable=False)
-    timePeriodEnd = Column(Numeric, nullable=False)
+    timePeriodStart = Column(DateTime, nullable=False)
+    timePeriodEnd = Column(DateTime, nullable=False)
     ensembleStatistic = Column(
         Enum(
             "average", "median", "10th percentile", "90th percentile",
@@ -91,6 +98,15 @@ class WxFile(File):
         ),
         nullable=False
     )
+    variables = Column(String(65), nullable=False)
+    anomaly = Column(
+        Enum(
+            "daily", "seasonal", "annual",
+            name="anomaly"
+        ),
+        nullable=False,
+    )
+    smoothing = Column(Integer, nullable=True)
 
-
-
+    # Relationships
+    location = relationship("Location", backref="wx_files")
