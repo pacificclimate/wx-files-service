@@ -208,12 +208,6 @@ components:
           description: URI for this resource
           type: string
           format: uri
-        title:
-          description: Location "title", standard EPW item
-          type: string
-        name:
-          description: Location name formed from city, province, country
-          type: string
         city:
           description: Location title, city component (if parseable)
           type: string
@@ -238,8 +232,6 @@ components:
       required:
         - id
         - selfUri
-        - title
-        - name
         - city
         - province
         - country
