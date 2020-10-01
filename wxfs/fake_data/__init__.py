@@ -62,7 +62,6 @@ def makeLocation(
     location = {
         "id": f"{locationId}",
         "selfUri": f"/locations/{locationId}",
-        "name": f"{city},{province},{country}",
         "city": city,
         "province": province,
         "country": country,
