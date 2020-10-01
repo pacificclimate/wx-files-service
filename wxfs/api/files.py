@@ -3,18 +3,22 @@ from wxfs.database import File
 from wxfs import get_app_session
 
 
-def uri(file):
+def selfUri(file):
     return url_for('.wxfs_api_files_get', id=file.id)
+
+
+def contentUri(file):
+    return url_for('.wxfs_api_files_getContent', id=file.id)
 
 
 def single_item_rep(file):
     """Return representation of a single file item."""
     rep_common = {
         "id": file.id,
-        "selfUri": uri(file),
+        "selfUri": selfUri(file),
         "fileType": file.fileType,
         "filepath": file.filepath,
-        "contentUri": "TBD",
+        "contentUri": contentUri(file),
     }
     if file.fileType == "weather":
         return {
