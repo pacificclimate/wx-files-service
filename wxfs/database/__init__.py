@@ -15,7 +15,7 @@ metadata = Base.metadata
 class Location(Base):
     """A location is a location for which there are files."""
     __tablename__ = "locations"
-    id = Column('location_id', Integer, primary_key=True, nullable=False)
+    id = Column("location_id", Integer, primary_key=True, nullable=False)
     city = Column(String(128), nullable=False)
     province = Column(String(2), nullable=False)
     country = Column(String(64), nullable=False)
@@ -28,7 +28,7 @@ class Location(Base):
 class File(Base):
     """Base type for polymorphic file objects. """
     __tablename__ = "files"
-    id = Column('file_id', Integer, primary_key=True, nullable=False)
+    id = Column("file_id", Integer, primary_key=True, nullable=False)
     # Discriminator for polymorphic type
     fileType = Column(
         Enum("summary", "weather", name="fileType"),
@@ -37,7 +37,12 @@ class File(Base):
     filepath = Column(String(2048), nullable=False)
 
     # Relationships
-    location_id = Column(Integer, ForeignKey('locations.location_id'))
+    location_id = Column(Integer, ForeignKey("locations.location_id"))
+
+    __mapper_args__ = {
+        "polymorphic_identity": "files",
+        "polymorphic_on": fileType
+    }
 
 
 class SummaryFile(File):
@@ -48,9 +53,9 @@ class SummaryFile(File):
     """
     __tablename__ = "summary_files"
     id = Column(
-        'summary_file_id',
+        "summary_file_id",
         Integer,
-        ForeignKey('files.file_id', ondelete='CASCADE'),
+        ForeignKey("files.file_id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     )
@@ -60,6 +65,9 @@ class SummaryFile(File):
     # Relationships
     location = relationship("Location", backref="summary_files")
 
+    __mapper_args__ = {
+        "polymorphic_identity": "summary",
+    }
 
 class WxFile(File):
     """A weather file contains weather information for a particular location.
@@ -67,9 +75,9 @@ class WxFile(File):
     """
     __tablename__ = "wx_files"
     id = Column(
-        'wx_file_id',
+        "wx_file_id",
         Integer,
-        ForeignKey('files.file_id', ondelete='CASCADE'),
+        ForeignKey("files.file_id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False
     )
@@ -110,3 +118,7 @@ class WxFile(File):
 
     # Relationships
     location = relationship("Location", backref="wx_files")
+
+    __mapper_args__ = {
+        "polymorphic_identity": "weather",
+    }
