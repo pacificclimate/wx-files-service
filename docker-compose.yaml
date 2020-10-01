@@ -7,6 +7,11 @@ services:
       - "30598:8000"
     env_file:
       - wx-files-service.env
+    volumes:
+      - type: bind
+        source: /storage/home/tmurdock/public_html/wx_files/
+        target: /storage/home/tmurdock/public_html/wx_files/
+        read_only: true
 
 networks:
   default:
