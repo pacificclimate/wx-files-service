@@ -33,7 +33,17 @@ $ source venv/bin/activate
 (venv)$ pip install -e .
 ```
 
+## Docker
+
+The service API is, of course, Dockerized. To build the Docker image locally:
+
+```
+docker build -t wx-files-service .
+```
+
 ## Run the service
+
+### Locally
 
 To run a dev server locally:
 
@@ -44,6 +54,9 @@ export FLASK_ENV=development
 flask run
 ```
 
+### In a docker container
+
+See `docker-compose.yaml` for an example.
 
 ## API design
 
