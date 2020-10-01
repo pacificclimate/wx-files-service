@@ -1,7 +1,7 @@
 """Weather file parsing functions.
 """
 
-# TODO: Split up station name into city, province, country?
+# TODO: Split up location name into city, province, country?
 # TODO: Parse out data source (CWEC2016) from location line, or is it fixed?
 
 import re
@@ -10,26 +10,33 @@ import datetime
 
 def get_wx_file_info(wx_file):
     """Parse a weather file (.epw) and return essential info, namely the information
-    that characterizes its station and the weather file data. Some of this information
+    that characterizes its location and the weather file data. Some of this information
     is externally determined or determined from its filename.
     """
     file_info = parse_file_name(wx_file.name)
-    time_period_centre = get_time_period_centre(file_info["timePeriod"])
+    time_period_centre_year = get_time_period_centre(file_info["timePeriod"])
     line = wx_file.readline()
     location_part, morphed, file_version, creation_date_part = line.split(' | ')
 
-    station = parse_location_part(location_part)
+    location = parse_location_part(location_part)
 
     wx_file = {
         "creationDate": parse_creation_date_part(creation_date_part),
         "dataSource": file_info["dataSource"],
         "designDataType": "TMY",
         "scenario": "RCP8.5",
-        "timePeriodCentre": time_period_centre,
+        "timePeriodStart":
+            datetime.datetime(time_period_centre_year-15, 1, 1),
+        "timePeriodEnd":
+            datetime.datetime(time_period_centre_year+15, 1, 1) -
+            datetime.timedelta(seconds=1),
         "ensembleStatistic": "average",
+        "variables": "all thermodynamic",
+        "anomaly": "daily",
+        "smoothing": 21
     }
 
-    return station, wx_file
+    return location, wx_file
 
 
 def parse_file_name(name):
@@ -53,18 +60,21 @@ def parse_file_name(name):
 
 def parse_location_part(part):
     """Parse the location part of the first line of a PCIC EPW file."""
-    regex = re.compile(
-        r"LOCATION,(?P<name>.*),CWEC2016,(?P<code>\w+),(?P<lat>-?\d+\.\d+),"
-        r"(?P<lon>-?\d+\.\d+),(?P<tz>-?\d+\.\d+),(?P<elev>-?\d+\.\d+)"
+    location_regex = re.compile(
+        r"LOCATION,(?P<city>[^,]+),(?P<province>[^,]+),(?P<country>[^,]+),CWEC2016,"
+        r"(?P<code>\w+),(?P<latitude>-?\d+\.\d+),(?P<longitude>-?\d+\.\d+),"
+        r"(?P<tz>-?\d+\.\d+),(?P<elevation>-?\d+\.\d+)"
     )
-    match = regex.match(part)
+    match = location_regex.match(part)
     if match:
         return {
-            "name": match.group("name"),
+            "city": match.group("city"),
+            "province": match.group("province"),
+            "country": match.group("country"),
             "code": match.group("code"),
-            "longitude": float(match.group("lon")),
-            "latitude": float(match.group("lat")),
-            "elevation": float(match.group("elev")),
+            "longitude": float(match.group("longitude")),
+            "latitude": float(match.group("latitude")),
+            "elevation": float(match.group("elevation")),
         }
     return None
 
