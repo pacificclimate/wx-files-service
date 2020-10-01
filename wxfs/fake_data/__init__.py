@@ -1,4 +1,10 @@
+from datetime import datetime
+
+
+today = datetime.today().strftime("%Y-%m-%d")
+
 fileId = 0
+files = []
 
 
 def makeFileCommon():
@@ -12,9 +18,10 @@ def makeFileCommon():
 
 
 def makeWxFile(tStart, tEnd):
-    return {
+    file = {
         **makeFileCommon(),
         "fileType": "weather",
+        "creationDate": today,
         "dataSource": "CWEC2016",
         "designDataType": "TMY",
         "scenario": "RCP8.5",
@@ -27,10 +34,12 @@ def makeWxFile(tStart, tEnd):
         "anomaly": "daily",
         "smoothing": "21",
     }
+    files.append(file)
+    return file
 
 
 def makeSummaryFile():
-    return {
+    file = {
         **makeFileCommon(),
         "fileType": "summary",
         "scenario": "RCP8.5",
@@ -38,17 +47,19 @@ def makeSummaryFile():
         "timePeriod": "all",
         "variables": "all thermodynamic",
     }
+    files.append(file)
+    return file
 
 
 locationId = -1
-
+locations = []
 
 def makeLocation(
     city, province, country, code, latitude, longitude, elevation
 ):
     global locationId
     locationId += 1
-    return {
+    location = {
         "id": f"{locationId}",
         "selfUri": f"/locations/{locationId}",
         "name": f"{city},{province},{country}",
@@ -66,11 +77,11 @@ def makeLocation(
             makeSummaryFile(),
         ],
     }
+    locations.append(location)
+    return location
 
 
-locations = [
-    makeLocation("Abbotsford Intl AP", "BC", "CAN", "711080", 49.02530, -122.3600, 59.1,),
-    makeLocation("Agassiz", "BC", "CAN", "711130", 49.24310, -121.7603, 19.3,),
-    makeLocation("Blue River AP", "BC2", "CAN", "718830", 52.12910, -119.2895, 682.8,),
-    makeLocation("Bonilla Island", "BC2", "CAN", "714840", 53.49280, -130.6390, 12.5,),
-]
+makeLocation("Abbotsford Intl AP", "BC", "CAN", "711080", 49.02530, -122.3600, 59.1,),
+makeLocation("Agassiz", "BC", "CAN", "711130", 49.24310, -121.7603, 19.3,),
+makeLocation("Blue River AP", "XX", "CAN", "718830", 52.12910, -119.2895, 682.8,),
+makeLocation("Bonilla Island", "XX", "CAN", "714840", 53.49280, -130.6390, 12.5,),
