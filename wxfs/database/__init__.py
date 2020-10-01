@@ -54,6 +54,8 @@ class SummaryFile(File):
         primary_key=True,
         nullable=False
     )
+    # TODO: Add attributes scenario, ensembleStatistic(s), timePeriod(s), variables.
+    #  These should be raised up to File where appropriate (scenario, variables, ...).
 
     # Relationships
     location = relationship("Location", backref="summary_files")

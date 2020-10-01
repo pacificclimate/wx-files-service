@@ -33,7 +33,15 @@ def single_item_rep(file):
             "smoothing": file.smoothing,
         }
     elif file.fileType == "summary":
-        return rep_common
+        return {
+            **rep_common,
+            # TODO: It is probably not right to fill these in statically.
+            #  See TODO in ORM definition
+            "scenario": "RCP8.5",
+            "ensembleStatistic": "multiple",
+            "timePeriod": "all",
+            "variables": "all thermodynamic",
+        }
     else:
         raise ValueError(f"Invalid file type: {file.fileType}")
 
