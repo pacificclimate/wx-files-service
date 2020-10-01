@@ -16,7 +16,9 @@ def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
     with open(make_wx_file(year, city, code, lon, lat, elev), "r") as wx_file:
         station_info, wx_file_info = get_wx_file_info(wx_file)
     assert station_info == {
-        "name": f"{city},BC,CAN",
+        "city": city,
+        "province": "BC",
+        "country": "CAN",
         "code": code,
         "longitude": lon,
         "latitude": lat,
@@ -27,7 +29,9 @@ def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
         "dataSource": "CWEC2016",
         "designDataType": "TMY",
         "scenario": "RCP8.5",
-        "timePeriodCentre": year + 5,
+        "timePeriodStart": datetime.datetime(year-10, 1, 1),
+        "timePeriodEnd":
+            datetime.datetime(year+20, 1, 1) - datetime.timedelta(seconds=1),
         "ensembleStatistic": "average",
     }
 
@@ -75,7 +79,9 @@ def test_parse_file_name(input, expected):
     (
         "LOCATION,Burns Lake AP,BC,CAN,CWEC2016,719520,54.38320,-125.9587,-8.0,713.2",
         {
-            "name": "Burns Lake AP,BC,CAN",
+            "country": "CAN",
+            "province": "BC",
+            "city": "Burns Lake AP",
             "code": "719520",
             "longitude": -125.9587,
             "latitude": 54.38320,
@@ -85,7 +91,9 @@ def test_parse_file_name(input, expected):
     (
         "LOCATION,Creston,BC,CAN,CWEC2016,717700,49.08170,-116.5007,-8.0,640.7",
         {
-            "name": "Creston,BC,CAN",
+            "country": "CAN",
+            "province": "BC",
+            "city": "Creston",
             "code": "717700",
             "longitude": -116.5007,
             "latitude": 49.08170,
