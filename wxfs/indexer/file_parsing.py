@@ -1,9 +1,6 @@
 """Weather file parsing functions.
 """
 
-# TODO: Split up location name into city, province, country?
-# TODO: Parse out data source (CWEC2016) from location line, or is it fixed?
-
 import re
 import datetime
 
@@ -18,9 +15,9 @@ def get_wx_file_info(wx_file):
     line = wx_file.readline()
     location_part, morphed, file_version, creation_date_part = line.split(' | ')
 
-    location = parse_location_part(location_part)
+    location_info = parse_location_part(location_part)
 
-    wx_file = {
+    wx_file_info = {
         "creationDate": parse_creation_date_part(creation_date_part),
         "dataSource": file_info["dataSource"],
         "designDataType": "TMY",
@@ -36,7 +33,7 @@ def get_wx_file_info(wx_file):
         "smoothing": 21
     }
 
-    return location, wx_file
+    return location_info, wx_file_info
 
 
 def parse_file_name(name):
@@ -95,4 +92,4 @@ def get_time_period_centre(time_period):
     where <year> is a 4-digit year multiple of 10 (e.g., "2050s").
     """
     year = int(time_period[0:4])
-    return year + 5;
+    return year + 5
