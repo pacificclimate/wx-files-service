@@ -8,7 +8,7 @@ setup(
     description="PCIC microservice for Wx Files (weather files)",
     keywords="sql database climate meteorology",
     packages=find_packages(),
-    version='.'.join(str(d) for d in __version__),
+    version=".".join(str(d) for d in __version__),
     url="http://www.pacificclimate.org/",
     author="Rod Glover",
     author_email="rglover@uvic.ca",
@@ -24,8 +24,12 @@ setup(
     """.split("\n"),
     zip_safe=True,
     include_package_data=True,
-    tests_require=['pytest', 'testing.postgresql'],
-    classifiers='''
+    tests_require=["pytest", "testing.postgresql"],
+    scripts="""
+        scripts/index_location
+        scripts/index_location_collection
+    """.split(),
+    classifiers="""
         Development Status :: 2 - Pre-Alpha
         Environment :: Web Environment
         Intended Audience :: Developers
@@ -38,5 +42,5 @@ setup(
         Topic :: Scientific/Engineering
         Topic :: Database
         Topic :: Software Development :: Libraries :: Python Modules
-    '''.split('\n')
+    """.split("\n")
 )

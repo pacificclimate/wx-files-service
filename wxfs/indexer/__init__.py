@@ -32,7 +32,7 @@ logger.setLevel(logging.DEBUG)
 # Useful constants
 
 wx_file_extension = ".epw"
-summary_file_extension = ".xslx"
+summary_file_extension = ".xlsx"
 
 
 # Indexing functions
@@ -48,8 +48,7 @@ def index_location_collection(sesh, filepath):
     logger.info(f"Indexing location collection at {filepath}")
     for entry in os.scandir(filepath):
         if entry.is_dir():
-            # Should this really yield?
-            yield index_location(sesh, entry.path)
+            index_location(sesh, entry.path)
 
 
 def index_location(sesh, filepath):
@@ -75,12 +74,15 @@ def index_location(sesh, filepath):
         name, extension = os.path.splitext(path)
         extension = extension.lower()
         if entry.is_file():
+            logger.debug("It's a file")
             if extension == wx_file_extension:
                 logger.debug(f"Found wx file {path}")
                 wx_filepaths.append(path)
             elif extension == summary_file_extension:
                 logger.debug(f"Found summary file {path}")
                 summary_filepath = path
+            else:
+                logger.debug(f"Found unknown type of file {path}")
 
     files = [index_wx_file(sesh, filepath) for filepath in wx_filepaths]
 
@@ -92,7 +94,7 @@ def index_location(sesh, filepath):
         if summary_filepath is not None:
             files.append(index_summary_file(sesh, location, summary_filepath))
     else:
-        logger.info(f"{filepath} does not contain any weather files")
+        logger.info(f"{filepath} does not contain any recognized files")
 
     return files
 
@@ -109,9 +111,12 @@ def index_wx_file(sesh, filepath):
     :return: WxFile ORM object
     """
     logger.info(f"Indexing weather file {filepath}")
-    check_extension(filepath, ".epw")
+    check_extension(filepath, wx_file_extension)
     with open(filepath, "r") as file:
         location_info, wx_file_info = get_wx_file_info(file)
+        if location_info is None or wx_file_info is None:
+            logger.info(f"Weather file {filepath} could not be processed, skipping")
+            return None
         location = find_or_insert(sesh, Location, location_info, {})
         wx_file = find_or_insert(
             sesh,
@@ -140,11 +145,12 @@ def index_summary_file(sesh, location, filepath):
     it is simple. But see note above.
     """
     logger.info(f"Indexing summary file {filepath}")
-    check_extension(filepath, ".xslx")
+    check_extension(filepath, summary_file_extension)
     summary_file = find_or_insert(
         sesh,
         SummaryFile,
         {
+            "fileType": "summary",
             "location": location,
         },
         {
