@@ -14,8 +14,8 @@ from wxfs.indexer.file_parsing import (
 ])
 def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
     with open(make_wx_file(year, city, code, lon, lat, elev), "r") as wx_file:
-        station_info, wx_file_info = get_wx_file_info(wx_file)
-    assert station_info == {
+        location_info, wx_file_info = get_wx_file_info(wx_file)
+    assert location_info == {
         "city": city,
         "province": "BC",
         "country": "CAN",
@@ -33,6 +33,9 @@ def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
         "timePeriodEnd":
             datetime.datetime(year+20, 1, 1) - datetime.timedelta(seconds=1),
         "ensembleStatistic": "average",
+        "anomaly": "daily",
+        "smoothing": 21,
+        "variables": "all thermodynamic"
     }
 
 
