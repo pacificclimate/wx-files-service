@@ -10,28 +10,30 @@ def get_wx_file_info(wx_file):
     that characterizes its location and the weather file data. Some of this information
     is externally determined or determined from its filename.
     """
-    file_info = parse_file_name(wx_file.name)
-    time_period_centre_year = get_time_period_centre(file_info["timePeriod"])
     line = wx_file.readline()
     location_part, morphed, file_version, creation_date_part = line.split(' | ')
-
     location_info = parse_location_part(location_part)
 
-    wx_file_info = {
-        "creationDate": parse_creation_date_part(creation_date_part),
-        "dataSource": file_info["dataSource"],
-        "designDataType": "TMY",
-        "scenario": "RCP8.5",
-        "timePeriodStart":
-            datetime.datetime(time_period_centre_year-15, 1, 1),
-        "timePeriodEnd":
-            datetime.datetime(time_period_centre_year+15, 1, 1) -
-            datetime.timedelta(seconds=1),
-        "ensembleStatistic": "average",
-        "variables": "all thermodynamic",
-        "anomaly": "daily",
-        "smoothing": 21
-    }
+    file_info = parse_file_name(wx_file.name)
+    if file_info is not None:
+        time_period_centre_year = get_time_period_centre(file_info["timePeriod"])
+        wx_file_info = {
+            "creationDate": parse_creation_date_part(creation_date_part),
+            "dataSource": file_info["dataSource"],
+            "designDataType": "TMY",
+            "scenario": "RCP8.5",
+            "timePeriodStart":
+                datetime.datetime(time_period_centre_year-15, 1, 1),
+            "timePeriodEnd":
+                datetime.datetime(time_period_centre_year+15, 1, 1) -
+                datetime.timedelta(seconds=1),
+            "ensembleStatistic": "average",
+            "variables": "all thermodynamic",
+            "anomaly": "daily",
+            "smoothing": 21
+        }
+    else:
+        wx_file_info = None
 
     return location_info, wx_file_info
 
