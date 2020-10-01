@@ -35,9 +35,9 @@ class File(Base):
         nullable=False
     )
     filepath = Column(String(2048), nullable=False)
+
     # Relationships
     location_id = Column(Integer, ForeignKey('locations.location_id'))
-    location = relationship("Location")
 
 
 class SummaryFile(File):
@@ -54,6 +54,9 @@ class SummaryFile(File):
         primary_key=True,
         nullable=False
     )
+
+    # Relationships
+    location = relationship("Location", backref="summary_files")
 
 
 class WxFile(File):
@@ -102,3 +105,6 @@ class WxFile(File):
         nullable=False,
     )
     smoothing = Column(Integer, nullable=True)
+
+    # Relationships
+    location = relationship("Location", backref="wx_files")
