@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from wxfs.fake_data import locations as locations_data
-from wxfs.database import (Base, Location, WxFile, SummaryFile)
+from wxfs.database import Base, Location, WxFile, SummaryFile
 from wxfs.indexer.db_helpers import find_or_insert
 
 
@@ -30,9 +30,9 @@ def populate(session):
             Location,
             dict_subset(
                 location_data,
-                "city, province, country, code, longitude, latitude, elevation"
+                "city, province, country, code, longitude, latitude, elevation",
             ),
-            {}
+            {},
         )
         for file_data in location_data["files"]:
             if file_data["fileType"] == "weather":
@@ -44,7 +44,7 @@ def populate(session):
                             file_data,
                             "fileType, dataSource, designDataType, "
                             "scenario, ensembleStatistic, "
-                            "variables, anomaly, smoothing"
+                            "variables, anomaly, smoothing",
                         ),
                         "creationDate": parse_time(file_data["creationDate"]),
                         "timePeriodStart": parse_time(file_data["timePeriod"]["start"]),
@@ -53,7 +53,7 @@ def populate(session):
                     },
                     {
                         "filepath": "filepath",
-                    }
+                    },
                 )
             elif file_data["fileType"] == "summary":
                 find_or_insert(
@@ -65,7 +65,7 @@ def populate(session):
                     },
                     {
                         "filepath": "filepath",
-                    }
+                    },
                 )
 
     session.commit()
@@ -99,14 +99,10 @@ if __name__ == "__main__":
         "-d",
         "--dsn",
         help="database connection string of the form "
-             "postgresql://user:password@host:port/database",
+        "postgresql://user:password@host:port/database",
         required=True,
     )
-    parser.add_argument(
-        "action",
-        choices=["create", "populate"],
-        help="What to do"
-    )
+    parser.add_argument("action", choices=["create", "populate"], help="What to do")
     args = parser.parse_args()
 
     main(dsn=args.dsn, action=args.action)
