@@ -21,7 +21,9 @@ setup(
         connexion[swagger-ui]
         alembic
         psycopg2
-    """.split("\n"),
+    """.split(
+        "\n"
+    ),
     zip_safe=True,
     include_package_data=True,
     tests_require=["pytest", "testing.postgresql"],
@@ -42,5 +44,7 @@ setup(
         Topic :: Scientific/Engineering
         Topic :: Database
         Topic :: Software Development :: Libraries :: Python Modules
-    """.split("\n")
+    """.split(
+        "\n"
+    ),
 )

@@ -4,11 +4,11 @@ from wxfs import get_app_session
 
 
 def selfUri(file):
-    return url_for('.wxfs_api_files_get', id=file.id)
+    return url_for(".wxfs_api_files_get", id=file.id)
 
 
 def contentUri(file):
-    return url_for('.wxfs_api_files_getContent', id=file.id)
+    return url_for(".wxfs_api_files_getContent", id=file.id)
 
 
 def single_item_rep(file):
@@ -63,22 +63,12 @@ def collection_rep(files):
 
 
 def listing():
-    files = (
-        get_app_session()
-            .query(File)
-            .order_by(File.id.asc())
-            .all()
-    )
+    files = get_app_session().query(File).order_by(File.id.asc()).all()
     return collection_rep(files)
 
 
 def get_file_by_id(id):
-    return (
-        get_app_session()
-            .query(File)
-            .filter_by(id=id)
-            .one()
-    )
+    return get_app_session().query(File).filter_by(id=id).one()
 
 
 def get(id):

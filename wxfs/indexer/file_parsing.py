@@ -11,7 +11,7 @@ def get_wx_file_info(wx_file):
     is externally determined or determined from its filename.
     """
     line = wx_file.readline()
-    location_part, morphed, file_version, creation_date_part = line.split(' | ')
+    location_part, morphed, file_version, creation_date_part = line.split(" | ")
     location_info = parse_location_part(location_part)
 
     file_info = parse_file_name(wx_file.name)
@@ -22,15 +22,13 @@ def get_wx_file_info(wx_file):
             "dataSource": file_info["dataSource"],
             "designDataType": "TMY",
             "scenario": "RCP8.5",
-            "timePeriodStart":
-                datetime.datetime(time_period_centre_year-15, 1, 1),
-            "timePeriodEnd":
-                datetime.datetime(time_period_centre_year+15, 1, 1) -
-                datetime.timedelta(seconds=1),
+            "timePeriodStart": datetime.datetime(time_period_centre_year - 15, 1, 1),
+            "timePeriodEnd": datetime.datetime(time_period_centre_year + 15, 1, 1)
+            - datetime.timedelta(seconds=1),
             "ensembleStatistic": "average",
             "variables": "all thermodynamic",
             "anomaly": "daily",
-            "smoothing": 21
+            "smoothing": 21,
         }
     else:
         wx_file_info = None

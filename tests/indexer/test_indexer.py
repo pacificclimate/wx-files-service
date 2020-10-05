@@ -2,18 +2,18 @@ import pytest
 
 import datetime
 
-from wxfs.indexer import (index_wx_file)
-from wxfs.database import (Location, WxFile)
+from wxfs.indexer import index_wx_file
+from wxfs.database import Location, WxFile
 
 
-@pytest.mark.parametrize("year, city, code, lon, lat, elev", [
-    (2020, "Anyville", "999999", 50.0, -124.5, 100.0),
-    (2050, "Elsewhere", "11111", 51.1, -125.2, 1000.0),
-])
-def test_index_one_wx_file(
-    year, city, code, lon, lat, elev,
-    db_session, make_wx_file
-):
+@pytest.mark.parametrize(
+    "year, city, code, lon, lat, elev",
+    [
+        (2020, "Anyville", "999999", 50.0, -124.5, 100.0),
+        (2050, "Elsewhere", "11111", 51.1, -125.2, 1000.0),
+    ],
+)
+def test_index_one_wx_file(year, city, code, lon, lat, elev, db_session, make_wx_file):
     wx_file_file_path = make_wx_file(year, city, code, lon, lat, elev)
     index_wx_file(db_session, wx_file_file_path)
 
@@ -33,19 +33,21 @@ def test_index_one_wx_file(
     assert wx_file.designDataType == "TMY"
     assert wx_file.scenario == "RCP8.5"
     print("timePeriodStart", wx_file.timePeriodStart)
-    assert wx_file.timePeriodStart.year == year - 10;
+    assert wx_file.timePeriodStart.year == year - 10
     print("timePeriodEnd", wx_file.timePeriodEnd)
-    assert wx_file.timePeriodEnd.year == year + 19;
+    assert wx_file.timePeriodEnd.year == year + 19
     assert wx_file.ensembleStatistic == "average"
 
 
-@pytest.mark.parametrize("years, city, code, lon, lat, elev", [
-    ((2020, 2050, 2080), "Anyville", "999999", 50.0, -124.5, 100.0),
-    # ("Elsewhere", "11111", 51.1, -125.2, 1000.0),
-])
+@pytest.mark.parametrize(
+    "years, city, code, lon, lat, elev",
+    [
+        ((2020, 2050, 2080), "Anyville", "999999", 50.0, -124.5, 100.0),
+        # ("Elsewhere", "11111", 51.1, -125.2, 1000.0),
+    ],
+)
 def test_index_many_wx_files(
-    years, city, code, lon, lat, elev,
-    db_session, make_wx_file
+    years, city, code, lon, lat, elev, db_session, make_wx_file
 ):
     for year in years:
         wx_file_file_path = make_wx_file(year, city, code, lon, lat, elev)

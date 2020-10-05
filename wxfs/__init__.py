@@ -20,16 +20,15 @@ flask_app = None
 app_db = None
 
 
-def create_app(config_override = {}):
+def create_app(config_override={}):
     global connexion_app, flask_app, app_db
-    connexion_app = connexion.FlaskApp(__name__, specification_dir='openapi/')
+    connexion_app = connexion.FlaskApp(__name__, specification_dir="openapi/")
 
     flask_app = connexion_app.app
     CORS(flask_app)
 
     flask_app.config.from_mapping(
-        SQLALCHEMY_DATABASE_URI=
-        os.getenv('WXFS_DSN', ''),
+        SQLALCHEMY_DATABASE_URI=os.getenv("WXFS_DSN", ""),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=False,
     )
@@ -44,7 +43,7 @@ def create_app(config_override = {}):
     # but it is (otherwise) a nice one and worth imposing this little bit of
     # ordering during setup.
 
-    connexion_app.add_api('api-spec.yaml')
+    connexion_app.add_api("api-spec.yaml")
 
     return connexion_app, flask_app, app_db
 

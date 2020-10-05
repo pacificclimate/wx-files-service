@@ -12,7 +12,7 @@ import os
 import logging
 import re
 
-from wxfs.database import (Location, WxFile, SummaryFile)
+from wxfs.database import Location, WxFile, SummaryFile
 from wxfs.indexer.file_parsing import get_wx_file_info
 from wxfs.indexer.db_helpers import find_or_insert
 
@@ -20,7 +20,8 @@ from wxfs.indexer.db_helpers import find_or_insert
 # Set up logging
 
 formatter = logging.Formatter(
-    '%(asctime)s %(levelname)s: %(message)s', "%Y-%m-%d %H:%M:%S")
+    "%(asctime)s %(levelname)s: %(message)s", "%Y-%m-%d %H:%M:%S"
+)
 handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 
@@ -36,6 +37,7 @@ summary_file_extension = ".xlsx"
 
 
 # Indexing functions
+
 
 def index_location_collection(sesh, filepath):
     """
@@ -128,7 +130,7 @@ def index_wx_file(sesh, filepath):
             },
             {
                 "filepath": filepath,
-            }
+            },
         )
         return wx_file
 
@@ -155,7 +157,7 @@ def index_summary_file(sesh, location, filepath):
         },
         {
             "filepath": filepath,
-        }
+        },
     )
     return summary_file
 
@@ -165,4 +167,3 @@ def check_extension(filepath, extension):
     name, ext = os.path.splitext(filepath)
     if ext != extension:
         raise ValueError(f"File {filepath} does not have extension '{extension}'.")
-
