@@ -27,7 +27,7 @@ class Location(Base):
 
 
 class File(Base):
-    """Base type for polymorphic file objects. """
+    """Base type for polymorphic file objects."""
 
     __tablename__ = "files"
     id = Column("file_id", Integer, primary_key=True, nullable=False)
