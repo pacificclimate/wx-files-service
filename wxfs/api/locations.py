@@ -35,7 +35,7 @@ def collection_item_rep(location):
 
 
 def collection_rep(locations):
-    """Return representation of locations collection. """
+    """Return representation of locations collection."""
     return [collection_item_rep(location) for location in locations]
 
 

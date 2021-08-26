@@ -58,7 +58,7 @@ def collection_item_rep(file):
 
 
 def collection_rep(files):
-    """Return representation of files collection. """
+    """Return representation of files collection."""
     return [collection_item_rep(file) for file in files]
 
 
