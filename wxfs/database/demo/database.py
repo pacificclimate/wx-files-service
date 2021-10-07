@@ -106,7 +106,7 @@ if __name__ == "__main__":
         choices=["create", "populate"],
         default=[],
         nargs="+",
-        help="What to do"
+        help="What to do",
     )
     args = parser.parse_args()
 
