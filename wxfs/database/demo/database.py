@@ -73,7 +73,7 @@ def populate(session):
 
 def main(dsn, actions):
     """
-    Create a wxfs database and/or populate with some stuff. Yeah, man!
+    Create a wxfs database and/or populate with some stuff.
 
     :param dsn: connection info for the modelmeta database to update
     :param actions: List of actions... Can be "create", "populate", or a list of both
@@ -106,7 +106,10 @@ if __name__ == "__main__":
         choices=["create", "populate"],
         default=[],
         nargs="+",
-        help="What to do",
+        help="Create all of the necessary tables (not the database proper) for this"
+        "application and/or populate said tables with some fake data for a"
+        "sample deployment. Invocation can take of the form of neither, either"
+        'or both choice. E.g. "database.py -d postgresql://user@host:port/database create populate"',
     )
     args = parser.parse_args()
 
