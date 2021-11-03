@@ -91,6 +91,12 @@ def index_location(sesh, filepath):
 
     # index_wx_file() can return None if it skips a file. Filter these
     # from the results lest the following loops crash and burn
+    skipped = [filepath for x, filepath in zip(files, wx_filepaths) if x is None]
+    logger.info(
+        "The following files were not indexed for a variety of reasons: %s", skipped
+    )
+    logger.info("See logs above for details.")
+
     files = [x for x in files if x is not None]
 
     if len(files) > 0:
