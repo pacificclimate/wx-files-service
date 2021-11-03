@@ -49,6 +49,7 @@ def index_location_collection(sesh, filepath):
     """
     logger.info(f"Indexing location collection at {filepath}")
     for entry in os.scandir(filepath):
+        logger.debug(f"{entry} {entry.is_dir()} {entry.path}")
         if entry.is_dir():
             index_location(sesh, entry.path)
 
@@ -88,8 +89,19 @@ def index_location(sesh, filepath):
 
     files = [index_wx_file(sesh, filepath) for filepath in wx_filepaths]
 
+    # index_wx_file() can return None if it skips a file. Filter these
+    # from the results lest the following loops crash and burn
+    skipped = [filepath for x, filepath in zip(files, wx_filepaths) if x is None]
+    logger.info(
+        "The following files were not indexed for a variety of reasons: %s", skipped
+    )
+    logger.info("See logs above for details.")
+
+    files = [x for x in files if x is not None]
+
     if len(files) > 0:
         location = files[0].location
+
         if not all(file.location == location for file in files):
             # Does this need to be pre-checked before doing any database activities?
             logger.warning("Shit, locations aren't all the same.")

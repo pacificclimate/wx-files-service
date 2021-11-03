@@ -71,26 +71,25 @@ def populate(session):
     session.commit()
 
 
-def main(dsn, action):
+def main(dsn, actions):
     """
-    Populate a wxfs database with some stuff. Yeah, man!
+    Create a wxfs database and/or populate with some stuff.
 
     :param dsn: connection info for the modelmeta database to update
+    :param actions: List of actions... Can be "create", "populate", or a list of both
     """
     engine = create_engine(dsn)
 
     engine.execute("SET search_path = wxfs, public")
 
-    if action == "create":
+    if "create" in actions:
         create_database(engine)
-        return
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-    populate(session)
-
-    session.close()
+    if "populate" in actions:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        populate(session)
+        session.close()
 
 
 if __name__ == "__main__":
@@ -102,7 +101,16 @@ if __name__ == "__main__":
         "postgresql://user:password@host:port/database",
         required=True,
     )
-    parser.add_argument("action", choices=["create", "populate"], help="What to do")
+    parser.add_argument(
+        "actions",
+        choices=["create", "populate"],
+        default=[],
+        nargs="+",
+        help="Create all of the necessary tables (not the database proper) for this"
+        "application and/or populate said tables with some fake data for a"
+        "sample deployment. Invocation can take of the form of neither, either"
+        'or both choice. E.g. "database.py -d postgresql://user@host:port/database create populate"',
+    )
     args = parser.parse_args()
 
-    main(dsn=args.dsn, action=args.action)
+    main(dsn=args.dsn, actions=args.actions)

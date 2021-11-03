@@ -3,6 +3,10 @@
 
 import re
 import datetime
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_wx_file_info(wx_file):
@@ -11,7 +15,15 @@ def get_wx_file_info(wx_file):
     is externally determined or determined from its filename.
     """
     line = wx_file.readline()
-    location_part, morphed, file_version, creation_date_part = line.split(" | ")
+    try:
+        location_part, morphed, file_version, creation_date_part = line.split(" | ")
+    except ValueError as e:
+        logger.error(
+            "Could not split the following line by ' | '... will have to return None: '%s'",
+            line,
+        )
+        return None, None
+
     location_info = parse_location_part(location_part)
 
     file_info = parse_file_name(wx_file.name)
