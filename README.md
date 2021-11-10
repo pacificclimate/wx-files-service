@@ -110,3 +110,17 @@ In outline, the endpoints are:
 - `/files/{id}`: Metadata for a single file.
 
 - `/files/{id}/content`: Data content of a single file. For downloading a file.
+
+### Releasing a new version
+
+1. Increment `version` in `setup.py`.
+2. Summarize the changes from the last version in `NEWS.md`.
+3. Commit these changes, then tag the release, and push all to GitHub,
+   including tag:
+
+   ```bash
+   git add setup.py NEWS.md
+   git commit -m "Bump to version x.x.x"
+   git tag -a -m "x.x.x" x.x.x
+   git push --follow-tags
+   ```
