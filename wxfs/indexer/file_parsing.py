@@ -23,13 +23,14 @@ def get_wx_file_info(
     if ver1_metadata_sep in line:
         # This appears to contain version 1 format metadata
         try:
-            location_part, _, _, creation_date_part = \
-                line.split(ver1_metadata_sep)
+            location_part, _, _, creation_date_part = line.split(
+                ver1_metadata_sep
+            )
         except ValueError as e:
             logger.error(
                 f"First line (listed below) contained ver 1 metadata separator "
                 f"'{ver1_metadata_sep}' but it did not contain 4 parts. "
-                f"\n{line}",
+                f"\n{line}"
             )
             return None, None
     else:
@@ -53,14 +54,20 @@ def get_wx_file_info(
 
     file_info = parse_file_name(wx_file.name)
     if file_info is not None:
-        time_period_centre_year = get_time_period_centre(file_info["timePeriod"])
+        time_period_centre_year = get_time_period_centre(
+            file_info["timePeriod"]
+        )
         wx_file_info = {
             "creationDate": parse_creation_date_part(creation_date_part),
             "dataSource": file_info["dataSource"],
             "designDataType": "TMY",
             "scenario": "RCP8.5",
-            "timePeriodStart": datetime.datetime(time_period_centre_year - 15, 1, 1),
-            "timePeriodEnd": datetime.datetime(time_period_centre_year + 15, 1, 1)
+            "timePeriodStart": datetime.datetime(
+                time_period_centre_year - 15, 1, 1
+            ),
+            "timePeriodEnd": datetime.datetime(
+                time_period_centre_year + 15, 1, 1
+            )
             - datetime.timedelta(seconds=1),
             "ensembleStatistic": "average",
             "variables": "all thermodynamic",

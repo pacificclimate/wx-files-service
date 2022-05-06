@@ -40,7 +40,9 @@ def collection_rep(locations):
 
 
 def listing():
-    locations = get_app_session().query(Location).order_by(Location.id.asc()).all()
+    locations = (
+        get_app_session().query(Location).order_by(Location.id.asc()).all()
+    )
     return collection_rep(locations)
 
 
