@@ -9,33 +9,65 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_wx_file_info(wx_file):
+def get_wx_file_info(
+    wx_file,
+    ver1_metadata_sep=" | ",
+    ver2_metadata_prefix="COMMENTS 2",
+    ver2_metadata_max_line_number=10,
+):
     """Parse a weather file (.epw) and return essential info, namely the information
     that characterizes its location and the weather file data. Some of this information
     is externally determined or determined from its filename.
     """
     line = wx_file.readline()
-    try:
-        location_part, morphed, file_version, creation_date_part = line.split(" | ")
-    except ValueError as e:
-        logger.error(
-            "Could not split the following line by ' | '... will have to return None: '%s'",
-            line,
-        )
-        return None, None
+    if ver1_metadata_sep in line:
+        # This appears to contain version 1 format metadata
+        try:
+            location_part, _, _, creation_date_part = line.split(
+                ver1_metadata_sep
+            )
+        except ValueError as e:
+            logger.error(
+                f"First line (listed below) contained ver 1 metadata separator "
+                f"'{ver1_metadata_sep}' but it did not contain 4 parts. "
+                f"\n{line}"
+            )
+            return None, None
+    else:
+        # Assume version 2 format metadata
+        location_part = line
+
+        line_num = 1
+        while not line.startswith(ver2_metadata_prefix):
+            line_num += 1
+            if line_num > ver2_metadata_max_line_number:
+                logger.error(
+                    f"Neither ver 1 nor ver 2 metadata indicators found in file"
+                )
+                return None, None
+            line = wx_file.readline()
+        # There's actually more than creation date in this line,
+        # but we don't care, parser is up to it.
+        creation_date_part = line
 
     location_info = parse_location_part(location_part)
 
     file_info = parse_file_name(wx_file.name)
     if file_info is not None:
-        time_period_centre_year = get_time_period_centre(file_info["timePeriod"])
+        time_period_centre_year = get_time_period_centre(
+            file_info["timePeriod"]
+        )
         wx_file_info = {
             "creationDate": parse_creation_date_part(creation_date_part),
             "dataSource": file_info["dataSource"],
             "designDataType": "TMY",
             "scenario": "RCP8.5",
-            "timePeriodStart": datetime.datetime(time_period_centre_year - 15, 1, 1),
-            "timePeriodEnd": datetime.datetime(time_period_centre_year + 15, 1, 1)
+            "timePeriodStart": datetime.datetime(
+                time_period_centre_year - 15, 1, 1
+            ),
+            "timePeriodEnd": datetime.datetime(
+                time_period_centre_year + 15, 1, 1
+            )
             - datetime.timedelta(seconds=1),
             "ensembleStatistic": "average",
             "variables": "all thermodynamic",
@@ -91,7 +123,7 @@ def parse_location_part(part):
 def parse_creation_date_part(part):
     """Parse the creation date part of the first line of a PCIC EPW file."""
     regex = re.compile(r"Creation Date:\s*(?P<date>\d{4}-\d{2}-\d{2})")
-    match = regex.match(part)
+    match = regex.search(part)
     if match:
         return datetime.datetime.strptime(match.group("date"), "%Y-%m-%d")
     return None

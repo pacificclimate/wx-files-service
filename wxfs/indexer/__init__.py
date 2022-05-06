@@ -10,7 +10,6 @@ the existing collection of weather files now at PCIC.
 
 import os
 import logging
-import re
 
 from wxfs.database import Location, WxFile, SummaryFile
 from wxfs.indexer.file_parsing import get_wx_file_info
@@ -91,9 +90,12 @@ def index_location(sesh, filepath):
 
     # index_wx_file() can return None if it skips a file. Filter these
     # from the results lest the following loops crash and burn
-    skipped = [filepath for x, filepath in zip(files, wx_filepaths) if x is None]
+    skipped = [
+        filepath for x, filepath in zip(files, wx_filepaths) if x is None
+    ]
     logger.info(
-        "The following files were not indexed for a variety of reasons: %s", skipped
+        "The following files were not indexed for a variety of reasons: %s",
+        skipped,
     )
     logger.info("See logs above for details.")
 
@@ -129,20 +131,16 @@ def index_wx_file(sesh, filepath):
     with open(filepath, "r") as file:
         location_info, wx_file_info = get_wx_file_info(file)
         if location_info is None or wx_file_info is None:
-            logger.info(f"Weather file {filepath} could not be processed, skipping")
+            logger.info(
+                f"Weather file {filepath} could not be processed, skipping"
+            )
             return None
         location = find_or_insert(sesh, Location, location_info, {})
         wx_file = find_or_insert(
             sesh,
             WxFile,
-            {
-                "fileType": "weather",
-                **wx_file_info,
-                "location": location,
-            },
-            {
-                "filepath": filepath,
-            },
+            {"fileType": "weather", **wx_file_info, "location": location},
+            {"filepath": filepath},
         )
         return wx_file
 
@@ -163,13 +161,8 @@ def index_summary_file(sesh, location, filepath):
     summary_file = find_or_insert(
         sesh,
         SummaryFile,
-        {
-            "fileType": "summary",
-            "location": location,
-        },
-        {
-            "filepath": filepath,
-        },
+        {"fileType": "summary", "location": location},
+        {"filepath": filepath},
     )
     return summary_file
 
@@ -178,4 +171,6 @@ def check_extension(filepath, extension):
     """Raise an error if filepath does not have specified extension."""
     name, ext = os.path.splitext(filepath)
     if ext != extension:
-        raise ValueError(f"File {filepath} does not have extension '{extension}'.")
+        raise ValueError(
+            f"File {filepath} does not have extension '{extension}'."
+        )

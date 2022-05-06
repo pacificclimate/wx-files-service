@@ -1,0 +1,28 @@
+version: '2.3'
+services:
+
+  wx-files-backend-prod:
+    image: pcic/wx-files-service:1.0.0
+    container_name: "wx-files-service-prod"
+    ports:
+      - "30598:8000"
+    env_file:
+      - wx-files-service.env
+    volumes:
+      - type: bind
+        source: /storage/data/projects/rci/weather_files/canada_cwec_files/morphed_v22_epw_files
+        target: /storage/data/projects/rci/weather_files/canada_cwec_files/morphed_v22_epw_files
+        read_only: true
+
+  wx-files-frontend-prod:
+    image: pcic/wx-files-frontend:1.0.0
+    container_name: "wx-files-frontend-prod"
+    ports:
+      - "30530:8080"
+    env_file:
+      - wx-files-frontend.env
+
+networks:
+  default:
+    external:
+      name: pcicbr0

@@ -3,7 +3,15 @@
 """
 # TODO: Datetime of indexing? Do we care?
 
-from sqlalchemy import Column, DateTime, Enum, Integer, String, Numeric, ForeignKey
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Enum,
+    Integer,
+    String,
+    Numeric,
+    ForeignKey,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -32,13 +40,18 @@ class File(Base):
     __tablename__ = "files"
     id = Column("file_id", Integer, primary_key=True, nullable=False)
     # Discriminator for polymorphic type
-    fileType = Column(Enum("summary", "weather", name="fileType"), nullable=False)
+    fileType = Column(
+        Enum("summary", "weather", name="fileType"), nullable=False
+    )
     filepath = Column(String(2048), nullable=False)
 
     # Relationships
     location_id = Column(Integer, ForeignKey("locations.location_id"))
 
-    __mapper_args__ = {"polymorphic_identity": "files", "polymorphic_on": fileType}
+    __mapper_args__ = {
+        "polymorphic_identity": "files",
+        "polymorphic_on": fileType,
+    }
 
 
 class SummaryFile(File):
@@ -62,9 +75,7 @@ class SummaryFile(File):
     # Relationships
     location = relationship("Location", backref="summary_files")
 
-    __mapper_args__ = {
-        "polymorphic_identity": "summary",
-    }
+    __mapper_args__ = {"polymorphic_identity": "summary"}
 
 
 class WxFile(File):
@@ -103,14 +114,11 @@ class WxFile(File):
     )
     variables = Column(String(65), nullable=False)
     anomaly = Column(
-        Enum("daily", "seasonal", "annual", name="anomaly"),
-        nullable=False,
+        Enum("daily", "seasonal", "annual", name="anomaly"), nullable=False
     )
     smoothing = Column(Integer, nullable=True)
 
     # Relationships
     location = relationship("Location", backref="wx_files")
 
-    __mapper_args__ = {
-        "polymorphic_identity": "weather",
-    }
+    __mapper_args__ = {"polymorphic_identity": "weather"}
