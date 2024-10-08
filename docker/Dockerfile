@@ -3,7 +3,7 @@
 # climate-explorer-backend/docker/Dockerfile.dev
 # As always with docker, is there a better way to do this? Almost certainly.
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 MAINTAINER Rod Glover <rglover@uvic.ca>
 
@@ -14,14 +14,15 @@ RUN apt-get update && \
         python3 \
         python3-dev \
         python3-pip \
-        postgresql-client
+        postgresql-client \
+	wget
 
 ADD . /app
 WORKDIR /app
 
-RUN pip3 install -U pip
-RUN pip3 install -i https://pypi.pacificclimate.org/simple/ -r requirements.txt
-RUN pip3 install .
+RUN wget -O - https://install.python-poetry.org | python3 -
+ENV PATH=/root/.local/bin:$PATH
+RUN poetry install
 
 EXPOSE 8000
 
