@@ -275,6 +275,7 @@ python-multipart = ">=0.0.5"
 PyYAML = ">=5.1"
 requests = ">=2.27"
 starlette = ">=0.35"
+swagger-ui-bundle = {version = ">=1.1.0", optional = true, markers = "extra == \"swagger-ui\""}
 typing-extensions = ">=4.6.1"
 werkzeug = ">=2.2.1"
 
@@ -1187,6 +1188,20 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
 [[package]]
+name = "swagger-ui-bundle"
+version = "1.1.0"
+description = "Swagger UI bundled for usage with Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "swagger_ui_bundle-1.1.0-py3-none-any.whl", hash = "sha256:f7526f7bb99923e10594c54247265839bec97e96b0438561ac86faf40d40dd57"},
+    {file = "swagger_ui_bundle-1.1.0.tar.gz", hash = "sha256:20673c3431c8733d5d1615ecf79d9acf30cff75202acaf21a7d9c7f489714529"},
+]
+
+[package.dependencies]
+Jinja2 = ">=3.0.0,<4.0.0"
+
+[[package]]
 name = "testing-common-database"
 version = "2.0.3"
 description = "utilities for testing.* packages"
@@ -1277,4 +1292,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f749af77adb44f0581fa1af073aeb1adb27356b040269c26a9297f7b2a09e24f"
+content-hash = "23fded18e9ca1bb09f27c596b6d8b3c4dacbde075af1d96df90cc9de75e91fb1"
