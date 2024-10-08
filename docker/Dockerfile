@@ -3,7 +3,7 @@
 # climate-explorer-backend/docker/Dockerfile.dev
 # As always with docker, is there a better way to do this? Almost certainly.
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 MAINTAINER Rod Glover <rglover@uvic.ca>
 
