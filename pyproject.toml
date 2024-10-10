@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.10"
 python-dateutil = "^2.9.0.post0"
 psycopg2 = "^2.9.9"
-Flask = "^3.0.3"
+Flask = "^2.0.2"
 Flask-Cors = "^5.0.0"
 Flask-SQLAlchemy = "^3.1.1"
 connexion = {extras = ["flask", "swagger-ui"], version = "^2.7.0"}
