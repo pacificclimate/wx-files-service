@@ -15,6 +15,7 @@ Flask-Cors = "^5.0.0"
 Flask-SQLAlchemy = "^3.1.1"
 connexion = {extras = ["swagger-ui"], version = "^3.1.0"}
 alembic = "^1.13.3"
+uvicorn = "^0.31.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
