@@ -31,4 +31,4 @@ ENV FLASK_ENV development
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-CMD poetry run uvicorn run:app -p 8000 -h 0.0.0.0 --no-reload
+CMD poetry run uvicorn --port 8000 --host 0.0.0.0 --reload run:app
