@@ -14,12 +14,9 @@ is automatically built by
 [a GitHub action](../.github/workflows/docker-publish.yml).
 
 A typical deployment of the frontend and backend is in `./docker`.
-The most up to date deployment configuration will be found in the deployment
-directories on the production server.
+The most up to date deployment configuration will be found in the [portainer-deployment respository](https://github.com/pacificclimate/portainer-deployment).
 
 ## HTTP Server
 
-The alert reader of the Dockerfile will notice that currently we run the 
-service using the Flask dev server. This is not recommended.
-In future we will use Gunicorn.
+We use the [uvicorn asgi server](https://www.uvicorn.org/) to run the service.
 
