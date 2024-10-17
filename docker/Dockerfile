@@ -26,7 +26,7 @@ RUN poetry install
 
 EXPOSE 8000
 
-ENV FLASK_APP wxfs.wsgi
+ENV FLASK_APP wxfs.asgi
 ENV FLASK_ENV development
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
