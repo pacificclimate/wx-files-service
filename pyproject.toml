@@ -21,10 +21,7 @@ classifiers = [
     "Topic :: Database",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
-scripts = [
-    "scripts/index_location",
-    "scripts/index_location_collection"
-]
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -42,6 +39,10 @@ pytest = "^8.3.3"
 "testing.postgresql" = "^1.3.0"
 alembic = "^1.13.3"
 alembic-verify = "^0.1.4"
+
+[tool.poetry.scripts]
+index_location = "scripts.index_location:main"
+index_location_collection = "scripts.index_location_collection:main"
 
 [build-system]
 requires = ["poetry-core"]
