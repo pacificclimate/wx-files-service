@@ -5,6 +5,26 @@ description = "PCIC microservice for Wx Files (weather files)"
 authors = ["Rod Glover <rglover@uvic.ca>"]
 license = "GNU General Public License v3 (GPLv3)"
 readme = "README.md"
+homepage = "http://www.pacificclimate.org/"
+repository = "https://github.com/pacificclimate/wx-files-service"
+keywords = ["sql", "database", "pcds", "crmp", "climate", "meteorology"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Internet",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+scripts = [
+    "scripts/index_location",
+    "scripts/index_location_collection"
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -13,7 +33,7 @@ psycopg2 = "^2.9.9"
 Flask = "^3.0.3"
 Flask-Cors = "^5.0.0"
 Flask-SQLAlchemy = "^3.1.1"
-connexion = {extras = ["swagger-ui", "flask", "uvicon"], version = "^3.1.0"}
+connexion = {extras = ["swagger-ui", "flask", "uvicorn"], version = "^3.1.0"}
 alembic = "^1.13.3"
 uvicorn = "^0.31.1"
 
