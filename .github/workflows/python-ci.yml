@@ -5,22 +5,19 @@ on: push
 jobs:
   test:
 
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install poetry
       run: |
-        pip install -U pip
-        pip install -i https://pypi.pacificclimate.org/simple -r requirements.txt -r test_requirements.txt
-        pip install -e .
+        wget -O - https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: Install python dependencies
+      run: |
+        poetry install --with=dev
     - name: Test with pytest (full)
       if: github.ref == 'refs/heads/master'
       run: |
@@ -28,4 +25,4 @@ jobs:
     - name: Test with pytest (fast)
       if: github.ref != 'refs/heads/master'
       run: |
-        py.test -m "not slow" -v --tb=short
+        poetry run py.test -m "not slow" -v --tb=short
