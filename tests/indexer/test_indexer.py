@@ -13,9 +13,10 @@ from wxfs.database import Location, WxFile
         (2050, "Elsewhere", "11111", 51.1, -125.2, 1000.0),
     ],
 )
-def test_index_one_wx_file(year, city, code, lon, lat, elev, db_session, make_wx_file):
+@pytest.mark.parametrize("version", ["cmip5", "cmip6"])
+def test_index_one_wx_file(year, city, code, lon, lat, elev, version, db_session, make_wx_file):
     wx_file_file_path = make_wx_file(year, city, code, lon, lat, elev)
-    index_wx_file(db_session, wx_file_file_path)
+    index_wx_file(db_session, version, wx_file_file_path)
 
     location = db_session.query(Location).one()
     assert location.city == city
@@ -25,6 +26,9 @@ def test_index_one_wx_file(year, city, code, lon, lat, elev, db_session, make_wx
     assert float(location.longitude) == lon
     assert float(location.latitude) == lat
     assert float(location.elevation) == elev
+
+    ver = db.session.query(Version).one()
+    assert ver.name == version 
 
     wx_file = db_session.query(WxFile).one()
     assert wx_file.location == location
@@ -51,7 +55,7 @@ def test_index_many_wx_files(
 ):
     for year in years:
         wx_file_file_path = make_wx_file(year, city, code, lon, lat, elev)
-        index_wx_file(db_session, wx_file_file_path)
+        index_wx_file(db_session, "cmip5", wx_file_file_path)
 
     station_q = db_session.query(Location)
     assert station_q.count() == 1

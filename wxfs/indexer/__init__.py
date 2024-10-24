@@ -109,12 +109,9 @@ def index_location(sesh, version, filepath):
             # Does this need to be pre-checked before doing any database activities?
             logger.warning("Shit, locations aren't all the same.")
         if summary_filepath is not None:
-            files.append(index_summary_file(sesh, location, summary_filepath))
+            files.append(index_summary_file(sesh, location, version, summary_filepath))
     else:
         logger.info(f"{filepath} does not contain any recognized files")
-
-    #find or create the version entry for these files.
-    version = find_or_insert(sesh, Version, {"name": version}, {})
 
     return files
 
@@ -140,16 +137,17 @@ def index_wx_file(sesh, version, filepath):
             )
             return None
         location = find_or_insert(sesh, Location, location_info, {})
+        ver = find_or_insert(sesh, Version, {"name": version}, {})
         wx_file = find_or_insert(
             sesh,
             WxFile,
-            {"fileType": "weather", **wx_file_info, "location": location, "version": version},
+            {"fileType": "weather", **wx_file_info, "location": location, "version": ver},
             {"filepath": filepath},
         )
         return wx_file
 
 
-def index_summary_file(sesh, location, filepath):
+def index_summary_file(sesh, location, version, filepath):
     """Index a summary file into the database.
 
     A summary file does not contain enough information to determine its location,
@@ -162,10 +160,12 @@ def index_summary_file(sesh, location, filepath):
     """
     logger.info(f"Indexing summary file {filepath}")
     check_extension(filepath, summary_file_extension)
+    
+    ver = find_or_insert(sesh, Version, {"name": version}, {})
     summary_file = find_or_insert(
         sesh,
         SummaryFile,
-        {"fileType": "summary", "location": location},
+        {"fileType": "summary", "location": location, "version": ver},
         {"filepath": filepath},
     )
     return summary_file

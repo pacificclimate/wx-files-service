@@ -38,7 +38,7 @@ class Version(Base):
     """A version describes a ser of data files with a common history"""
     
     __tablename__ = "versions"
-    id = Column("version_id", Integer, primary_key=True, nuuable=False)
+    id = Column("version_id", Integer, primary_key=True, nullable=False)
     name = Column(String(12), nullable=False)
     description = Column(String(64), nullable=True)
 
