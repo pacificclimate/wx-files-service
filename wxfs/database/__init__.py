@@ -84,6 +84,7 @@ class SummaryFile(File):
 
     # Relationships
     location = relationship("Location", backref="summary_files")
+    version = relationship("Version", backref='summary_files')
 
     __mapper_args__ = {"polymorphic_identity": "summary"}
 
@@ -130,5 +131,6 @@ class WxFile(File):
 
     # Relationships
     location = relationship("Location", backref="wx_files")
+    version = relationship("Version", backref="wx_files")
 
     __mapper_args__ = {"polymorphic_identity": "weather"}
