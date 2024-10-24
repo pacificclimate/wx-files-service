@@ -3,7 +3,7 @@ import pytest
 import datetime
 
 from wxfs.indexer import index_wx_file
-from wxfs.database import Location, WxFile
+from wxfs.database import Location, WxFile, Version
 
 
 @pytest.mark.parametrize(
@@ -27,7 +27,7 @@ def test_index_one_wx_file(year, city, code, lon, lat, elev, version, db_session
     assert float(location.latitude) == lat
     assert float(location.elevation) == elev
 
-    ver = db.session.query(Version).one()
+    ver = db_session.query(Version).one()
     assert ver.name == version 
 
     wx_file = db_session.query(WxFile).one()
