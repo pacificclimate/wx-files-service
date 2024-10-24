@@ -11,7 +11,7 @@ the existing collection of weather files now at PCIC.
 import os
 import logging
 
-from wxfs.database import Location, WxFile, SummaryFile
+from wxfs.database import Location, WxFile, SummaryFile, Version
 from wxfs.indexer.file_parsing import get_wx_file_info
 from wxfs.indexer.db_helpers import find_or_insert
 
@@ -38,7 +38,7 @@ summary_file_extension = ".xlsx"
 # Indexing functions
 
 
-def index_location_collection(sesh, filepath):
+def index_location_collection(sesh, version, filepath):
     """
     Index a collection of location subdirectories in directory `filepath`.
 
@@ -50,10 +50,10 @@ def index_location_collection(sesh, filepath):
     for entry in os.scandir(filepath):
         logger.debug(f"{entry} {entry.is_dir()} {entry.path}")
         if entry.is_dir():
-            index_location(sesh, entry.path)
+            index_location(sesh, version, entry.path)
 
 
-def index_location(sesh, filepath):
+def index_location(sesh, version, filepath):
     """
     Index a single location, defined by the files in location directory at `filepath`.
 
@@ -85,8 +85,9 @@ def index_location(sesh, filepath):
                 summary_filepath = path
             else:
                 logger.debug(f"Found unknown type of file {path}")
-
-    files = [index_wx_file(sesh, filepath) for filepath in wx_filepaths]
+    
+    files = [index_wx_file(sesh, version, filepath) for filepath in wx_filepaths]
+    
 
     # index_wx_file() can return None if it skips a file. Filter these
     # from the results lest the following loops crash and burn
@@ -112,10 +113,13 @@ def index_location(sesh, filepath):
     else:
         logger.info(f"{filepath} does not contain any recognized files")
 
+    #find or create the version entry for these files.
+    version = find_or_insert(sesh, Version, {"name": version}, {})
+
     return files
 
 
-def index_wx_file(sesh, filepath):
+def index_wx_file(sesh, version, filepath):
     """Index a weather file into the database.
 
     A weather file contains all information necessary to determine both its location
@@ -139,7 +143,7 @@ def index_wx_file(sesh, filepath):
         wx_file = find_or_insert(
             sesh,
             WxFile,
-            {"fileType": "weather", **wx_file_info, "location": location},
+            {"fileType": "weather", **wx_file_info, "location": location, "version": version},
             {"filepath": filepath},
         )
         return wx_file

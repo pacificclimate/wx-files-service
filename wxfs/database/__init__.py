@@ -34,6 +34,15 @@ class Location(Base):
     elevation = Column(Numeric, nullable=True)
 
 
+class Version(Base):
+    """A version describes a ser of data files with a common history"""
+    
+    __tablename__ = "versions"
+    id = Column("version_id", Integer, primary_key=True, nuuable=False)
+    name = Column(String(12), nullable=False)
+    description = Column(String(64), nullable=True)
+
+
 class File(Base):
     """Base type for polymorphic file objects."""
 
@@ -47,6 +56,7 @@ class File(Base):
 
     # Relationships
     location_id = Column(Integer, ForeignKey("locations.location_id"))
+    version_id = Column(Integer, ForeignKey("versions.version_id"))
 
     __mapper_args__ = {
         "polymorphic_identity": "files",

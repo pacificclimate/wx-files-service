@@ -5,13 +5,13 @@ from sqlalchemy.orm import sessionmaker
 from wxfs.indexer import index_location
 
 
-def main(dsn, directories):
+def main(dsn, version, directories):
     engine = create_engine(dsn)
     Session = sessionmaker(bind=engine)
     session = Session()
 
     for directory in directories:
-        index_location(session, directory)
+        index_location(session, version, directory)
 
     session.commit()  # TODO: Move inside index_location?
     session.close()
@@ -23,7 +23,8 @@ if __name__ == "__main__":
         "into index database"
     )
     parser.add_argument("-d", "--dsn", help="DSN for index database")
+    parser.add_argument("-v", "--version", help="Data version (ie CMIP6, CMIP5)")
     parser.add_argument("directories", nargs="+", help="Directories to process")
     args = parser.parse_args()
 
-    main(dsn=args.dsn, directories=args.directories)
+    main(dsn=args.dsn, version=args.version, directories=args.directories)
