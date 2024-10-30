@@ -35,7 +35,7 @@ def test_index_one_wx_file(year, city, code, lon, lat, elev, version, db_session
     assert wx_file.creationDate == datetime.datetime(2020, 6, 23)
     assert wx_file.dataSource == "CWEC2016"
     assert wx_file.designDataType == "TMY"
-    assert wx_file.scenario == "RCP8.5"
+    assert wx_file.scenario == "RCP85"
     print("timePeriodStart", wx_file.timePeriodStart)
     assert wx_file.timePeriodStart.year == year - 10
     print("timePeriodEnd", wx_file.timePeriodEnd)

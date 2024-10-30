@@ -32,7 +32,7 @@ def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
         "creationDate": datetime.datetime(2020, 6, 23),
         "dataSource": "CWEC2016",
         "designDataType": "TMY",
-        "scenario": "RCP8.5",
+        "scenario": "RCP85",
         "timePeriodStart": datetime.datetime(year - 10, 1, 1),
         "timePeriodEnd": datetime.datetime(year + 20, 1, 1)
         - datetime.timedelta(seconds=1),
