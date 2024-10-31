@@ -55,8 +55,8 @@ class File(Base):
     filepath = Column(String(2048), nullable=False)
     
     scenario = Column(
-        Enum("RCP26", "RCP45", "RCP85", 
-             "SSP585", "SSP245", "SSP126", "multiple", 
+        Enum("RCP 2.6", "RCP 4.5", "RCP 8.5", 
+             "SSP5 85", "SSP245", "SSP126", "multiple", 
              name="scenario"), 
         nullable=False
     )

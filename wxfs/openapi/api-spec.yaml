@@ -297,10 +297,10 @@ components:
           enum: ["TMY", "XMY", "TSY", "AMY", "design day"]  # To be extended.
         scenario:
           description: |
-            RCP (represenatative concentration pathway) in model(s) used to
-            generate this file.
+            RCP (represenatative concentration pathway) or SSP (shared 
+			socioeconomic pathway) in model(s) used to generate this file.
           type: string
-          enum: ["RCP2.6", "RCP4.5", "RCP8.5"]
+          enum: ["RCP 2.6", "RCP 4.5", "RCP 8.5", "SSP1-2.6", "SSP2-4.5", "SSP5-8.5"]
         timePeriod:
           $ref: '#/components/schemas/TimePeriod'
         ensembleStatistic:

@@ -24,7 +24,7 @@ def makeWxFile(tStart, tEnd):
         "creationDate": today,
         "dataSource": "CWEC2016",
         "designDataType": "TMY",
-        "scenario": "RCP8.5",
+        "scenario": "RCP85",
         "timePeriod": {"start": tStart, "end": tEnd},
         "ensembleStatistic": "median",
         "variables": "all thermodynamic",
@@ -39,7 +39,7 @@ def makeSummaryFile():
     file = {
         **makeFileCommon(),
         "fileType": "summary",
-        "scenario": "RCP8.5",
+        "scenario": "RCP85",
         "ensembleStatistic": "multiple",
         "timePeriod": "all",
         "variables": "all thermodynamic",

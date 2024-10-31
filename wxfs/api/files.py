@@ -41,7 +41,7 @@ def single_item_rep(file):
             **rep_common,
             # TODO: It is probably not right to fill these in statically.
             #  See TODO in ORM definition
-            "scenario": "RCP8.5",
+            "scenario": file.scenario,
             "ensembleStatistic": "multiple",
             "timePeriod": "all",
             "variables": "all thermodynamic",
