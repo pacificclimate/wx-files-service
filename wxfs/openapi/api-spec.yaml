@@ -260,6 +260,16 @@ components:
         fileType:
           type: string
           enum: [summary, weather]
+		version:
+		  description: CMIP version data models belong to
+		  type: string
+		  enum: ["cmip5", "cmip6"]
+		scenario:
+		  description: |
+            RCP (represenatative concentration pathway) or SSP (shared 
+            socioeconomic pathway) in model(s) used to generate this file.
+		  type: string
+		  enum: ["RCP 2.6", "RCP 4.5", "RCP 8.5", "SSP1-2.6", "SSP2-4.5", "SSP5-8.5"]
         filepath:
           description: Filepath in storage to file contents
           type: string
@@ -274,6 +284,8 @@ components:
       required:
         - id
         - fileType
+        - version
+        - scenario
         - filepath
         - selfUri
         - contentUri
@@ -295,12 +307,6 @@ components:
             - `TMY`: Typical meteorological year
           type: string
           enum: ["TMY", "XMY", "TSY", "AMY", "design day"]  # To be extended.
-        scenario:
-          description: |
-            RCP (represenatative concentration pathway) or SSP (shared 
-			socioeconomic pathway) in model(s) used to generate this file.
-          type: string
-          enum: ["RCP 2.6", "RCP 4.5", "RCP 8.5", "SSP1-2.6", "SSP2-4.5", "SSP5-8.5"]
         timePeriod:
           $ref: '#/components/schemas/TimePeriod'
         ensembleStatistic:
