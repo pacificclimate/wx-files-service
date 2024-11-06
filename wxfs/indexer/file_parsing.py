@@ -23,8 +23,6 @@ def get_wx_file_info(
     scenario_part = None
     
     line = wx_file.readline()
-    print("beginning line is")
-    print(line)
     if ver1_metadata_sep in line:
         # This appears to contain version 1 format metadata
         try:
@@ -54,14 +52,10 @@ def get_wx_file_info(
                 )
                 return None, None
             line = wx_file.readline()
-            print("line is")
-            print(line)
             if line.startswith(ver2_scenario_prefix):
-                print("found scenario")
                 scenario_part = line
             elif line.startswith(ver2_creation_prefix):
                 creation_date_part = line
-                print("found creation")
 
 
     location_info = parse_location_part(location_part)
@@ -96,18 +90,34 @@ def get_wx_file_info(
 
 def parse_file_name(name):
     """Parse out info from the file name of a PCIC EPW file."""
-    regex = re.compile(
-        r"(?P<timePeriod>\d{4}s)_(?P<country>\w+)_(?P<province>\w+)_(?P<city>.+)"
-        r"\.(?P<code>\d+)_(?P<dataSource>\w+)\.[eE][pP][wW]"
-    )
-    match = regex.search(name)
+    # this function is complicated by differences in CMIP5 and CMIP6 
+    # versions of the data.
+    # CMIP6 data has an emissions scenario in the filename, CMIP5 data 
+    # has a numerical location code in the filename.
+    cmip6 = "RCP" in name or "SSP" in name
+    
+    if cmip6:    
+        scenario_start = name.find("RCP") if name.find("RCP") >= 0 else name.find("SSP")
+        scenario_end = name.find("_", scenario_start)
+        name = name[scenario_end + 1:]
+        template = re.compile(
+            r"(?P<timePeriod>\d{4}s)_(?P<country>\w+)_(?P<province>\w+)_(?P<city>.+)"
+            r"\_(?P<dataSource>\w+)\.[eE][pP][wW]"
+        )
+    else:
+        template = re.compile(
+            r"(?P<timePeriod>\d{4}s)_(?P<country>\w+)_(?P<province>\w+)_(?P<city>.+)"
+            r"\.(?P<code>\d+)_(?P<dataSource>\w+)\.[eE][pP][wW]"
+        )
+        
+    match = template.search(name)
     if match:
         return {
             "timePeriod": match.group("timePeriod"),
             "country": match.group("country"),
             "province": match.group("province"),
             "city": match.group("city"),
-            "code": match.group("code"),
+            "code": "fakecode" if cmip6 else match.group("code"),
             "dataSource": match.group("dataSource"),
         }
     return None
@@ -115,8 +125,8 @@ def parse_file_name(name):
 
 def parse_location_part(part):
     """Parse the location part of the first line of a PCIC EPW file."""
-    location_regex = re.compile(
-        r"LOCATION,(?P<city>[^,]+),(?P<province>[^,]+),(?P<country>[^,]+),CWEC2016,"
+    location_regex = re.compile(       
+        r"LOCATION,(?P<city>[^,]+),(?P<province>[^,]+),(?P<country>[^,]+),CWEC20\d\d,"
         r"(?P<code>\w+),(?P<latitude>-?\d+\.\d+),(?P<longitude>-?\d+\.\d+),"
         r"(?P<tz>-?\d+\.\d+),(?P<elevation>-?\d+\.\d+)"
     )
@@ -154,8 +164,6 @@ def parse_scenario_part(part):
         "SSP585": "SSP5-8.5"
         }
     if part:
-        print("scenario part is")
-        print(part)
         for code in scenarios:
             if code in part:
                 return scenarios[code]

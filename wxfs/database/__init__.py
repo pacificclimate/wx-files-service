@@ -56,7 +56,7 @@ class File(Base):
     
     scenario = Column(
         Enum("RCP 2.6", "RCP 4.5", "RCP 8.5", 
-             "SSP5 85", "SSP245", "SSP126", "multiple", 
+             "SSP5-8.5", "SSP2-4.5", "SSP1-2.6", "multiple", 
              name="scenario"), 
         nullable=False
     )
