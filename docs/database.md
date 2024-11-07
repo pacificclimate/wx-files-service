@@ -94,11 +94,13 @@ Typically, all the files to be indexed are under a single root
 directory. (Such a root directory contains one or more subdirectories, 
 one per "location", which is a province or territory.)
 
+<version> is the broad ensembles of files, such as "CMIP5" or "CMIP6".
+
 Run:
 
 ```shell
 for i in <root dir>/*; do \
-  index_location_collection -d <DSN> $i; 
+  index_location_collection -d <DSN> -v <version> $i; 
 done 2>&1 | tee wxfs-indexing.log
 ```
 
@@ -109,7 +111,7 @@ scattered in widely different directories, you will have to obtain each
 location directory path and do the following for each such path:
 
 ```shell
-index_location_collection -d <DSN> <path> | tee wxfs-indexing.log
+index_location_collection -d <DSN> -v <version> <path> | tee wxfs-indexing.log
 ```
 
 Or the equivalent bash scripting to read the location paths out of a file.
