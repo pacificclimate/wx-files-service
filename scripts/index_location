@@ -23,7 +23,7 @@ if __name__ == "__main__":
         "into index database"
     )
     parser.add_argument("-d", "--dsn", help="DSN for index database")
-    parser.add_argument("-v", "--version", help="Data version (ie CMIP6, CMIP5)")
+    parser.add_argument("-v", "--version", help="Data version", choices=["CMIP5", "CMIP6"])
     parser.add_argument("directories", nargs="+", help="Directories to process")
     args = parser.parse_args()
 
