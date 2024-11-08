@@ -12,7 +12,7 @@ import os
 import logging
 
 from wxfs.database import Location, WxFile, SummaryFile, Version
-from wxfs.indexer.file_parsing import get_wx_file_info
+from wxfs.indexer.file_parsing import get_wx_file_info, summarize_attribute
 from wxfs.indexer.db_helpers import find_or_insert
 
 
@@ -104,12 +104,13 @@ def index_location(sesh, version, filepath):
 
     if len(files) > 0:
         location = files[0].location
+        scenario = summarize_attribute(files, "scenario")
 
         if not all(file.location == location for file in files):
             # Does this need to be pre-checked before doing any database activities?
             logger.warning("Shit, locations aren't all the same.")
         if summary_filepath is not None:
-            files.append(index_summary_file(sesh, location, version, summary_filepath))
+            files.append(index_summary_file(sesh, location, scenario, version, summary_filepath))
     else:
         logger.info(f"{filepath} does not contain any recognized files")
 
@@ -147,7 +148,7 @@ def index_wx_file(sesh, version, filepath):
         return wx_file
 
 
-def index_summary_file(sesh, location, version, filepath):
+def index_summary_file(sesh, location, scenario, version, filepath):
     """Index a summary file into the database.
 
     A summary file does not contain enough information to determine its location,
@@ -165,7 +166,7 @@ def index_summary_file(sesh, location, version, filepath):
     summary_file = find_or_insert(
         sesh,
         SummaryFile,
-        {"fileType": "summary", "location": location, "version": ver},
+        {"fileType": "summary", "location": location, "version": ver, "scenario": scenario},
         {"filepath": filepath},
     )
     return summary_file

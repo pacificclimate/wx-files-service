@@ -183,12 +183,12 @@ def summarize_attribute(files, attribute):
     """Used to populate metadata for summary files. Accepts a collection of files
     and the name of an attribute. If every file has the same_value for that 
     attribute, returns that value. Otherwise returns the string 'multiple'"""
-    values = set([file[attribute] for file in files])
+    values = set([getattr(file, attribute) for file in files])
     
-    if values.length == 0:
+    if len(values) == 0:
         return None
-    elif values.length == 1:
-        return values[0]
+    elif len(values) == 1:
+        return list(values)[0]
     else:
         return "multiple"
     
