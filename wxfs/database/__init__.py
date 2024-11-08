@@ -40,7 +40,7 @@ class Version(Base):
 
     __tablename__ = "versions"
     id = Column("version_id", Integer, primary_key=True, nullable=False)
-    name = Column(String(12), nullable=False)
+    name = Column(String(64), nullable=False)
 
 
 class File(Base):

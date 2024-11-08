@@ -35,7 +35,7 @@ def single_item_rep(file):
             "variables": file.variables,
             "anomaly": file.anomaly,
             "smoothing": file.smoothing,
-            "version": file.version,
+            "version": file.version.name,
         }
     elif file.fileType == "summary":
         return {
@@ -43,7 +43,7 @@ def single_item_rep(file):
             # TODO: It is probably not right to fill these in statically.
             #  See TODO in ORM definition
             "scenario": file.scenario,
-            "version": file.version,
+            "version": file.version.name,
             "ensembleStatistic": "multiple",
             "timePeriod": "all",
             "variables": "all thermodynamic",
