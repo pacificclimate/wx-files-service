@@ -47,12 +47,8 @@ def populate(session):
                             "variables, anomaly, smoothing",
                         ),
                         "creationDate": parse_time(file_data["creationDate"]),
-                        "timePeriodStart": parse_time(
-                            file_data["timePeriod"]["start"]
-                        ),
-                        "timePeriodEnd": parse_time(
-                            file_data["timePeriod"]["end"]
-                        ),
+                        "timePeriodStart": parse_time(file_data["timePeriod"]["start"]),
+                        "timePeriodEnd": parse_time(file_data["timePeriod"]["end"]),
                         "location": location,
                     },
                     {"filepath": "filepath"},

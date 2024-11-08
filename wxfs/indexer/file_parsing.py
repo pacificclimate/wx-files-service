@@ -21,14 +21,12 @@ def get_wx_file_info(
     is externally determined or determined from its filename.
     """
     scenario_part = None
-    
+
     line = wx_file.readline()
     if ver1_metadata_sep in line:
         # This appears to contain version 1 format metadata
         try:
-            location_part, _, _, creation_date_part = line.split(
-                ver1_metadata_sep
-            )
+            location_part, _, _, creation_date_part = line.split(ver1_metadata_sep)
         except ValueError as e:
             logger.error(
                 f"First line (listed below) contained ver 1 metadata separator "
@@ -39,9 +37,8 @@ def get_wx_file_info(
     else:
         # Assume version 2 format metadata
         location_part = line
-        
-        creation_date_part = None
 
+        creation_date_part = None
 
         line_num = 1
         while not creation_date_part or not scenario_part:
@@ -57,25 +54,18 @@ def get_wx_file_info(
             elif line.startswith(ver2_creation_prefix):
                 creation_date_part = line
 
-
     location_info = parse_location_part(location_part)
 
     file_info = parse_file_name(wx_file.name)
     if file_info is not None:
-        time_period_centre_year = get_time_period_centre(
-            file_info["timePeriod"]
-        )
+        time_period_centre_year = get_time_period_centre(file_info["timePeriod"])
         wx_file_info = {
             "creationDate": parse_creation_date_part(creation_date_part),
             "dataSource": file_info["dataSource"],
             "designDataType": "TMY",
             "scenario": parse_scenario_part(scenario_part),
-            "timePeriodStart": datetime.datetime(
-                time_period_centre_year - 15, 1, 1
-            ),
-            "timePeriodEnd": datetime.datetime(
-                time_period_centre_year + 15, 1, 1
-            )
+            "timePeriodStart": datetime.datetime(time_period_centre_year - 15, 1, 1),
+            "timePeriodEnd": datetime.datetime(time_period_centre_year + 15, 1, 1)
             - datetime.timedelta(seconds=1),
             "ensembleStatistic": "average",
             "variables": "all thermodynamic",
@@ -90,16 +80,16 @@ def get_wx_file_info(
 
 def parse_file_name(name):
     """Parse out info from the file name of a PCIC EPW file."""
-    # this function is complicated by differences in CMIP5 and CMIP6 
+    # this function is complicated by differences in CMIP5 and CMIP6
     # versions of the data.
-    # CMIP6 data has an emissions scenario in the filename, CMIP5 data 
+    # CMIP6 data has an emissions scenario in the filename, CMIP5 data
     # has a numerical location code in the filename.
     cmip6 = "RCP" in name or "SSP" in name
-    
-    if cmip6:    
+
+    if cmip6:
         scenario_start = name.find("RCP") if name.find("RCP") >= 0 else name.find("SSP")
         scenario_end = name.find("_", scenario_start)
-        name = name[scenario_end + 1:]
+        name = name[scenario_end + 1 :]
         template = re.compile(
             r"(?P<timePeriod>\d{4}s)_(?P<country>\w+)_(?P<province>\w+)_(?P<city>.+)"
             r"\_(?P<dataSource>\w+)\.[eE][pP][wW]"
@@ -109,7 +99,7 @@ def parse_file_name(name):
             r"(?P<timePeriod>\d{4}s)_(?P<country>\w+)_(?P<province>\w+)_(?P<city>.+)"
             r"\.(?P<code>\d+)_(?P<dataSource>\w+)\.[eE][pP][wW]"
         )
-        
+
     match = template.search(name)
     if match:
         return {
@@ -125,7 +115,7 @@ def parse_file_name(name):
 
 def parse_location_part(part):
     """Parse the location part of the first line of a PCIC EPW file."""
-    location_regex = re.compile(       
+    location_regex = re.compile(
         r"LOCATION,(?P<city>[^,]+),(?P<province>[^,]+),(?P<country>[^,]+),CWEC20\d\d,"
         r"(?P<code>\w+),(?P<latitude>-?\d+\.\d+),(?P<longitude>-?\d+\.\d+),"
         r"(?P<tz>-?\d+\.\d+),(?P<elevation>-?\d+\.\d+)"
@@ -152,7 +142,8 @@ def parse_creation_date_part(part):
         return datetime.datetime.strptime(match.group("date"), "%Y-%m-%d")
     return None
 
-def parse_scenario_part(part): 
+
+def parse_scenario_part(part):
     """Parse the emissions scenario from the comment line"""
     # just look for a word that starts either RCP or SSP.
     scenarios = {
@@ -161,14 +152,15 @@ def parse_scenario_part(part):
         "RCP26": "RCP 2.6",
         "SSP126": "SSP1-2.6",
         "SSP245": "SSP2-4.5",
-        "SSP585": "SSP5-8.5"
-        }
+        "SSP585": "SSP5-8.5",
+    }
     if part:
         for code in scenarios:
             if code in part:
                 return scenarios[code]
-    logger.info ("No scenario data found. Defaulting to RCP 8.5")
+    logger.info("No scenario data found. Defaulting to RCP 8.5")
     return "RCP 8.5"
+
 
 def get_time_period_centre(time_period):
     """
@@ -179,17 +171,16 @@ def get_time_period_centre(time_period):
     year = int(time_period[0:4])
     return year + 5
 
+
 def summarize_attribute(files, attribute):
     """Used to populate metadata for summary files. Accepts a collection of files
-    and the name of an attribute. If every file has the same_value for that 
+    and the name of an attribute. If every file has the same_value for that
     attribute, returns that value. Otherwise returns the string 'multiple'"""
     values = set([getattr(file, attribute) for file in files])
-    
+
     if len(values) == 0:
         return None
     elif len(values) == 1:
         return list(values)[0]
     else:
         return "multiple"
-    
-    

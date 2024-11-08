@@ -1,6 +1,7 @@
 """ORM for the Wx Files database.
 
 """
+
 # TODO: Datetime of indexing? Do we care?
 
 from sqlalchemy import (
@@ -36,7 +37,7 @@ class Location(Base):
 
 class Version(Base):
     """A version describes a ser of data files with a common history"""
-    
+
     __tablename__ = "versions"
     id = Column("version_id", Integer, primary_key=True, nullable=False)
     name = Column(String(12), nullable=False)
@@ -48,16 +49,21 @@ class File(Base):
     __tablename__ = "files"
     id = Column("file_id", Integer, primary_key=True, nullable=False)
     # Discriminator for polymorphic type
-    fileType = Column(
-        Enum("summary", "weather", name="fileType"), nullable=False
-    )
+    fileType = Column(Enum("summary", "weather", name="fileType"), nullable=False)
     filepath = Column(String(2048), nullable=False)
-    
+
     scenario = Column(
-        Enum("RCP 2.6", "RCP 4.5", "RCP 8.5", 
-             "SSP5-8.5", "SSP2-4.5", "SSP1-2.6", "multiple", 
-             name="scenario"), 
-        nullable=False
+        Enum(
+            "RCP 2.6",
+            "RCP 4.5",
+            "RCP 8.5",
+            "SSP5-8.5",
+            "SSP2-4.5",
+            "SSP1-2.6",
+            "multiple",
+            name="scenario",
+        ),
+        nullable=False,
     )
 
     # Relationships
@@ -90,7 +96,7 @@ class SummaryFile(File):
 
     # Relationships
     location = relationship("Location", backref="summary_files")
-    version = relationship("Version", backref='summary_files')
+    version = relationship("Version", backref="summary_files")
 
     __mapper_args__ = {"polymorphic_identity": "summary"}
 
