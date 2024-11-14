@@ -94,7 +94,9 @@ Typically, all the files to be indexed are under a single root
 directory. (Such a root directory contains one or more subdirectories, 
 one per "location", which is a province or territory.)
 
-<version> is the broad ensembles of files, such as "CMIP5" or "CMIP6".
+`version` is the broad ensemble of files. Currently "CMIP5 and "CMIP6"
+are accepted as `version`s. Each version should be in a separate
+master directory.
 
 Run:
 
@@ -115,3 +117,24 @@ index_location_collection -d <DSN> -v <version> <path> | tee wxfs-indexing.log
 ```
 
 Or the equivalent bash scripting to read the location paths out of a file.
+
+### Note on location table entries
+
+At present, CMIP5 and CMIP6 locations use different levels of precision in
+their coordinates, which causes them to be indexed as different locations. For
+example, consider the following two locations:
+
+| location_id | name               | province | country | code    | longitude | latitude | elevation |
+|-------------|--------------------|----------|---------|---------|-----------|----------|-----------|
+| 219         | Churchill Falls AP | NL       | CAN     | 7100020 | -64.1064  | 53.5619  | 439.5     |
+| 707         | CHURCHILL FALLS    | NL       | CAN     | 7100020 | -64.11    | 53.56    | 439.5     |
+
+To a human, these appear to be the same location, but they will be indexed as
+two separate locations, since their coordinates are not strictly equal.
+
+At present this unintuitive behaviour does not present an issue, as we always
+display CMIP5 and CMIP6 data files seperately. In fact, this bug is beneficial,
+as it allows to to preserve the official location names from both the CMIP5 and
+CMIP6 datasets.
+
+But if use cases or data formats change, it may need to be resolved in the future.

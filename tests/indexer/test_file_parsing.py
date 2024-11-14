@@ -18,7 +18,9 @@ from wxfs.indexer.file_parsing import (
 )
 @pytest.mark.parametrize("version", [1, 2])
 def test_get_wx_file_info(year, city, code, lon, lat, elev, version, make_wx_file):
-    with open(make_wx_file(year, city, code, lon, lat, elev, "RCP85", version), "r") as wx_file:
+    with open(
+        make_wx_file(year, city, code, lon, lat, elev, "RCP85", version), "r"
+    ) as wx_file:
         location_info, wx_file_info = get_wx_file_info(wx_file)
     assert location_info == {
         "city": city,

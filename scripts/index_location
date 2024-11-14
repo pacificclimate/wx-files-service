@@ -6,6 +6,9 @@ from wxfs.indexer import index_location
 
 
 def main(dsn, version, directories):
+    """Indexes all files in a single directory. The files must all correspond to
+    the same location (read from the files) and share a version (input as an 
+    argument). Files may be either data files or summary files."""
     engine = create_engine(dsn)
     Session = sessionmaker(bind=engine)
     session = Session()

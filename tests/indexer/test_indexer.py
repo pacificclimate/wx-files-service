@@ -14,7 +14,9 @@ from wxfs.database import Location, WxFile, Version
     ],
 )
 @pytest.mark.parametrize("version", ["cmip5", "cmip6"])
-def test_index_one_wx_file(year, city, code, lon, lat, elev, version, db_session, make_wx_file):
+def test_index_one_wx_file(
+    year, city, code, lon, lat, elev, version, db_session, make_wx_file
+):
     wx_file_file_path = make_wx_file(year, city, code, lon, lat, elev)
     index_wx_file(db_session, version, wx_file_file_path)
 
@@ -28,7 +30,7 @@ def test_index_one_wx_file(year, city, code, lon, lat, elev, version, db_session
     assert float(location.elevation) == elev
 
     ver = db_session.query(Version).one()
-    assert ver.name == version 
+    assert ver.name == version
 
     wx_file = db_session.query(WxFile).one()
     assert wx_file.location == location

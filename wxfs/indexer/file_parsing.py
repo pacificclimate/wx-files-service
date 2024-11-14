@@ -19,6 +19,13 @@ def get_wx_file_info(
     """Parse a weather file (.epw) and return essential info, namely the information
     that characterizes its location and the weather file data. Some of this information
     is externally determined or determined from its filename.
+
+    The .EPW format specification is flexible, and we have seen and support two
+    different strategies to formatting metadata in these files. "Format 1" puts most metadata
+    in the LOCATION line; "Format 2" puts more metadata in COMMENT lines. We distinguish
+    between them here by looking for a | in the LOCATION line, which in Format 1
+    files comes between the location metadata and additional metadata unrelated to
+    location.
     """
     scenario_part = None
 
@@ -107,7 +114,7 @@ def parse_file_name(name):
             "country": match.group("country"),
             "province": match.group("province"),
             "city": match.group("city"),
-            "code": "fakecode" if cmip6 else match.group("code"),
+            "code": None if cmip6 else match.group("code"),
             "dataSource": match.group("dataSource"),
         }
     return None

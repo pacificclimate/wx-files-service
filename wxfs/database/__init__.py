@@ -36,7 +36,7 @@ class Location(Base):
 
 
 class Version(Base):
-    """A version describes a ser of data files with a common history"""
+    """A version describes a set of data files with a common history"""
 
     __tablename__ = "versions"
     id = Column("version_id", Integer, primary_key=True, nullable=False)
