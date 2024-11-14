@@ -35,14 +35,6 @@ class Location(Base):
     elevation = Column(Numeric, nullable=True)
 
 
-class Version(Base):
-    """A version describes a set of data files with a common history"""
-
-    __tablename__ = "versions"
-    id = Column("version_id", Integer, primary_key=True, nullable=False)
-    name = Column(String(64), nullable=False)
-
-
 class File(Base):
     """Base type for polymorphic file objects."""
 
@@ -66,9 +58,10 @@ class File(Base):
         nullable=False,
     )
 
+    version = Column(Enum("CMIP5", "CMIP6", name="version"), nullable=False)
+
     # Relationships
     location_id = Column(Integer, ForeignKey("locations.location_id"))
-    version_id = Column(Integer, ForeignKey("versions.version_id"))
 
     __mapper_args__ = {
         "polymorphic_identity": "files",
@@ -96,7 +89,6 @@ class SummaryFile(File):
 
     # Relationships
     location = relationship("Location", backref="summary_files")
-    version = relationship("Version", backref="summary_files")
 
     __mapper_args__ = {"polymorphic_identity": "summary"}
 
@@ -141,6 +133,5 @@ class WxFile(File):
 
     # Relationships
     location = relationship("Location", backref="wx_files")
-    version = relationship("Version", backref="wx_files")
 
     __mapper_args__ = {"polymorphic_identity": "weather"}

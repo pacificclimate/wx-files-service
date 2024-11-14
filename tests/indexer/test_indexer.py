@@ -3,7 +3,7 @@ import pytest
 import datetime
 
 from wxfs.indexer import index_wx_file
-from wxfs.database import Location, WxFile, Version
+from wxfs.database import Location, WxFile
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ from wxfs.database import Location, WxFile, Version
         (2050, "Elsewhere", "11111", 51.1, -125.2, 1000.0),
     ],
 )
-@pytest.mark.parametrize("version", ["cmip5", "cmip6"])
+@pytest.mark.parametrize("version", ["CMIP5", "CMIP6"])
 def test_index_one_wx_file(
     year, city, code, lon, lat, elev, version, db_session, make_wx_file
 ):
@@ -29,9 +29,6 @@ def test_index_one_wx_file(
     assert float(location.latitude) == lat
     assert float(location.elevation) == elev
 
-    ver = db_session.query(Version).one()
-    assert ver.name == version
-
     wx_file = db_session.query(WxFile).one()
     assert wx_file.location == location
     assert wx_file.creationDate == datetime.datetime(2020, 6, 23)
@@ -43,6 +40,7 @@ def test_index_one_wx_file(
     print("timePeriodEnd", wx_file.timePeriodEnd)
     assert wx_file.timePeriodEnd.year == year + 19
     assert wx_file.ensembleStatistic == "average"
+    assert wx_file.version == version
 
 
 @pytest.mark.parametrize(
@@ -57,7 +55,7 @@ def test_index_many_wx_files(
 ):
     for year in years:
         wx_file_file_path = make_wx_file(year, city, code, lon, lat, elev)
-        index_wx_file(db_session, "cmip5", wx_file_file_path)
+        index_wx_file(db_session, "CMIP5", wx_file_file_path)
 
     station_q = db_session.query(Location)
     assert station_q.count() == 1

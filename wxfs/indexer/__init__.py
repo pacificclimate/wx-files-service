@@ -11,7 +11,7 @@ the existing collection of weather files now at PCIC.
 import os
 import logging
 
-from wxfs.database import Location, WxFile, SummaryFile, Version
+from wxfs.database import Location, WxFile, SummaryFile
 from wxfs.indexer.file_parsing import get_wx_file_info, summarize_attribute
 from wxfs.indexer.db_helpers import find_or_insert
 
@@ -135,7 +135,6 @@ def index_wx_file(sesh, version, filepath):
             logger.info(f"Weather file {filepath} could not be processed, skipping")
             return None
         location = find_or_insert(sesh, Location, location_info, {})
-        ver = find_or_insert(sesh, Version, {"name": version}, {})
         wx_file = find_or_insert(
             sesh,
             WxFile,
@@ -143,7 +142,7 @@ def index_wx_file(sesh, version, filepath):
                 "fileType": "weather",
                 **wx_file_info,
                 "location": location,
-                "version": ver,
+                "version": version,
             },
             {"filepath": filepath},
         )
@@ -164,14 +163,13 @@ def index_summary_file(sesh, location, scenario, version, filepath):
     logger.info(f"Indexing summary file {filepath}")
     check_extension(filepath, summary_file_extension)
 
-    ver = find_or_insert(sesh, Version, {"name": version}, {})
     summary_file = find_or_insert(
         sesh,
         SummaryFile,
         {
             "fileType": "summary",
             "location": location,
-            "version": ver,
+            "version": version,
             "scenario": scenario,
         },
         {"filepath": filepath},

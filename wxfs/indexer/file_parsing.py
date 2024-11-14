@@ -31,7 +31,7 @@ def get_wx_file_info(
 
     line = wx_file.readline()
     if ver1_metadata_sep in line:
-        # This appears to contain version 1 format metadata
+        # This appears to contain format 1 metadata
         try:
             location_part, _, _, creation_date_part = line.split(ver1_metadata_sep)
         except ValueError as e:
@@ -42,7 +42,7 @@ def get_wx_file_info(
             )
             return None, None
     else:
-        # Assume version 2 format metadata
+        # Assume format 2 metadata
         location_part = line
 
         creation_date_part = None
