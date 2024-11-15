@@ -82,6 +82,13 @@ of weather files into the database.
    ```shell
    python database.py -d <DSN> populate
    ```
+You may have to explicitly grant table access to the read-only account,
+like this:
+
+   ```sql
+   GRANT SELECT ON ALL TABLES IN SCHEMA public TO wxfs_ro;
+   ```
+
 
 ## Index files into the database
 
