@@ -1,6 +1,7 @@
 """ORM for the Wx Files database.
 
 """
+
 # TODO: Datetime of indexing? Do we care?
 
 from sqlalchemy import (
@@ -40,10 +41,24 @@ class File(Base):
     __tablename__ = "files"
     id = Column("file_id", Integer, primary_key=True, nullable=False)
     # Discriminator for polymorphic type
-    fileType = Column(
-        Enum("summary", "weather", name="fileType"), nullable=False
-    )
+    fileType = Column(Enum("summary", "weather", name="fileType"), nullable=False)
     filepath = Column(String(2048), nullable=False)
+
+    scenario = Column(
+        Enum(
+            "RCP 2.6",
+            "RCP 4.5",
+            "RCP 8.5",
+            "SSP5-8.5",
+            "SSP2-4.5",
+            "SSP1-2.6",
+            "multiple",
+            name="scenario",
+        ),
+        nullable=False,
+    )
+
+    version = Column(Enum("CMIP5", "CMIP6", name="version"), nullable=False)
 
     # Relationships
     location_id = Column(Integer, ForeignKey("locations.location_id"))
@@ -70,7 +85,7 @@ class SummaryFile(File):
         nullable=False,
     )
     # TODO: Add attributes scenario, ensembleStatistic(s), timePeriod(s), variables.
-    #  These should be raised up to File where appropriate (scenario, variables, ...).
+    #  These should be raised up to File where appropriate (variables, ...).
 
     # Relationships
     location = relationship("Location", backref="summary_files")
@@ -97,9 +112,7 @@ class WxFile(File):
         Enum("TMY", "XMY", "TSY", "AMY", "design day", name="designDataType"),
         nullable=False,
     )
-    scenario = Column(
-        Enum("RCP2.6", "RCP4.5", "RCP8.5", name="scenario"), nullable=False
-    )
+
     timePeriodStart = Column(DateTime, nullable=False)
     timePeriodEnd = Column(DateTime, nullable=False)
     ensembleStatistic = Column(

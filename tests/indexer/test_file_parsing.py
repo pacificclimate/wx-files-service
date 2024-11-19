@@ -16,8 +16,11 @@ from wxfs.indexer.file_parsing import (
         (2050, "Elsewhere", "11111", 51.1, -125.2, 1000.0),
     ],
 )
-def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
-    with open(make_wx_file(year, city, code, lon, lat, elev), "r") as wx_file:
+@pytest.mark.parametrize("version", [1, 2])
+def test_get_wx_file_info(year, city, code, lon, lat, elev, version, make_wx_file):
+    with open(
+        make_wx_file(year, city, code, lon, lat, elev, "RCP85", version), "r"
+    ) as wx_file:
         location_info, wx_file_info = get_wx_file_info(wx_file)
     assert location_info == {
         "city": city,
@@ -32,7 +35,7 @@ def test_get_wx_file_info(year, city, code, lon, lat, elev, make_wx_file):
         "creationDate": datetime.datetime(2020, 6, 23),
         "dataSource": "CWEC2016",
         "designDataType": "TMY",
-        "scenario": "RCP8.5",
+        "scenario": "RCP 8.5",
         "timePeriodStart": datetime.datetime(year - 10, 1, 1),
         "timePeriodEnd": datetime.datetime(year + 20, 1, 1)
         - datetime.timedelta(seconds=1),

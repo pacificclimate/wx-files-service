@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import re
 from datetime import datetime
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from wxfs.fake_data import locations as locations_data
@@ -47,12 +47,8 @@ def populate(session):
                             "variables, anomaly, smoothing",
                         ),
                         "creationDate": parse_time(file_data["creationDate"]),
-                        "timePeriodStart": parse_time(
-                            file_data["timePeriod"]["start"]
-                        ),
-                        "timePeriodEnd": parse_time(
-                            file_data["timePeriod"]["end"]
-                        ),
+                        "timePeriodStart": parse_time(file_data["timePeriod"]["start"]),
+                        "timePeriodEnd": parse_time(file_data["timePeriod"]["end"]),
                         "location": location,
                     },
                     {"filepath": "filepath"},
@@ -76,8 +72,9 @@ def main(dsn, actions):
     :param actions: List of actions... Can be "create", "populate", or a list of both
     """
     engine = create_engine(dsn)
+    db_connection = engine.connect()
 
-    engine.execute("SET search_path = wxfs, public")
+    db_connection.execute(text("SET search_path = wxfs, public"))
 
     if "create" in actions:
         create_database(engine)

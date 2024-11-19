@@ -24,7 +24,7 @@ def makeWxFile(tStart, tEnd):
         "creationDate": today,
         "dataSource": "CWEC2016",
         "designDataType": "TMY",
-        "scenario": "RCP8.5",
+        "scenario": "RCP85",
         "timePeriod": {"start": tStart, "end": tEnd},
         "ensembleStatistic": "median",
         "variables": "all thermodynamic",
@@ -39,7 +39,7 @@ def makeSummaryFile():
     file = {
         **makeFileCommon(),
         "fileType": "summary",
-        "scenario": "RCP8.5",
+        "scenario": "RCP85",
         "ensembleStatistic": "multiple",
         "timePeriod": "all",
         "variables": "all thermodynamic",
@@ -76,13 +76,7 @@ def makeLocation(city, province, country, code, latitude, longitude, elevation):
     return location
 
 
-makeLocation(
-    "Abbotsford Intl AP", "BC", "CAN", "711080", 49.02530, -122.3600, 59.1
-),
+makeLocation("Abbotsford Intl AP", "BC", "CAN", "711080", 49.02530, -122.3600, 59.1),
 makeLocation("Agassiz", "BC", "CAN", "711130", 49.24310, -121.7603, 19.3),
-makeLocation(
-    "Blue River AP", "XX", "CAN", "718830", 52.12910, -119.2895, 682.8
-),
-makeLocation(
-    "Bonilla Island", "XX", "CAN", "714840", 53.49280, -130.6390, 12.5
-),
+makeLocation("Blue River AP", "XX", "CAN", "718830", 52.12910, -119.2895, 682.8),
+makeLocation("Bonilla Island", "XX", "CAN", "714840", 53.49280, -130.6390, 12.5),

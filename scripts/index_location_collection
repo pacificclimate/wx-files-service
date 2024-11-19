@@ -5,12 +5,19 @@ from sqlalchemy.orm import sessionmaker
 from wxfs.indexer import index_location_collection
 
 
-def main(dsn, directory):
+def main(dsn, version, directory):
+    """Indexes a master directory containing one or more location directories.
+    Attempts to index all files in each location directory inside the master
+    directory. All files in a location directory must correspond to
+    the same location (read from the files). All files in the
+    master directory must share a version (input as an 
+    argument)."""
+
     engine = create_engine(dsn)
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    index_location_collection(session, directory)
+    index_location_collection(session, version, directory)
 
     session.commit()  # TODO: Move inside index_location?
     session.close()
@@ -22,7 +29,8 @@ if __name__ == "__main__":
         "into index database"
     )
     parser.add_argument("-d", "--dsn", help="DSN for index database")
+    parser.add_argument("-v", "--version", help="Data version", choices=["CMIP5", "CMIP6"])
     parser.add_argument("directory", help="Collection directory")
     args = parser.parse_args()
 
-    main(dsn=args.dsn, directory=args.directory)
+    main(dsn=args.dsn, version=args.version, directory=args.directory)

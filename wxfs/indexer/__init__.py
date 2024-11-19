@@ -12,7 +12,7 @@ import os
 import logging
 
 from wxfs.database import Location, WxFile, SummaryFile
-from wxfs.indexer.file_parsing import get_wx_file_info
+from wxfs.indexer.file_parsing import get_wx_file_info, summarize_attribute
 from wxfs.indexer.db_helpers import find_or_insert
 
 
@@ -38,7 +38,7 @@ summary_file_extension = ".xlsx"
 # Indexing functions
 
 
-def index_location_collection(sesh, filepath):
+def index_location_collection(sesh, version, filepath):
     """
     Index a collection of location subdirectories in directory `filepath`.
 
@@ -50,10 +50,10 @@ def index_location_collection(sesh, filepath):
     for entry in os.scandir(filepath):
         logger.debug(f"{entry} {entry.is_dir()} {entry.path}")
         if entry.is_dir():
-            index_location(sesh, entry.path)
+            index_location(sesh, version, entry.path)
 
 
-def index_location(sesh, filepath):
+def index_location(sesh, version, filepath):
     """
     Index a single location, defined by the files in location directory at `filepath`.
 
@@ -86,13 +86,11 @@ def index_location(sesh, filepath):
             else:
                 logger.debug(f"Found unknown type of file {path}")
 
-    files = [index_wx_file(sesh, filepath) for filepath in wx_filepaths]
+    files = [index_wx_file(sesh, version, filepath) for filepath in wx_filepaths]
 
     # index_wx_file() can return None if it skips a file. Filter these
     # from the results lest the following loops crash and burn
-    skipped = [
-        filepath for x, filepath in zip(files, wx_filepaths) if x is None
-    ]
+    skipped = [filepath for x, filepath in zip(files, wx_filepaths) if x is None]
     logger.info(
         "The following files were not indexed for a variety of reasons: %s",
         skipped,
@@ -103,19 +101,22 @@ def index_location(sesh, filepath):
 
     if len(files) > 0:
         location = files[0].location
+        scenario = summarize_attribute(files, "scenario")
 
         if not all(file.location == location for file in files):
             # Does this need to be pre-checked before doing any database activities?
             logger.warning("Shit, locations aren't all the same.")
         if summary_filepath is not None:
-            files.append(index_summary_file(sesh, location, summary_filepath))
+            files.append(
+                index_summary_file(sesh, location, scenario, version, summary_filepath)
+            )
     else:
         logger.info(f"{filepath} does not contain any recognized files")
 
     return files
 
 
-def index_wx_file(sesh, filepath):
+def index_wx_file(sesh, version, filepath):
     """Index a weather file into the database.
 
     A weather file contains all information necessary to determine both its location
@@ -131,21 +132,24 @@ def index_wx_file(sesh, filepath):
     with open(filepath, "r") as file:
         location_info, wx_file_info = get_wx_file_info(file)
         if location_info is None or wx_file_info is None:
-            logger.info(
-                f"Weather file {filepath} could not be processed, skipping"
-            )
+            logger.info(f"Weather file {filepath} could not be processed, skipping")
             return None
         location = find_or_insert(sesh, Location, location_info, {})
         wx_file = find_or_insert(
             sesh,
             WxFile,
-            {"fileType": "weather", **wx_file_info, "location": location},
+            {
+                "fileType": "weather",
+                **wx_file_info,
+                "location": location,
+                "version": version,
+            },
             {"filepath": filepath},
         )
         return wx_file
 
 
-def index_summary_file(sesh, location, filepath):
+def index_summary_file(sesh, location, scenario, version, filepath):
     """Index a summary file into the database.
 
     A summary file does not contain enough information to determine its location,
@@ -158,10 +162,16 @@ def index_summary_file(sesh, location, filepath):
     """
     logger.info(f"Indexing summary file {filepath}")
     check_extension(filepath, summary_file_extension)
+
     summary_file = find_or_insert(
         sesh,
         SummaryFile,
-        {"fileType": "summary", "location": location},
+        {
+            "fileType": "summary",
+            "location": location,
+            "version": version,
+            "scenario": scenario,
+        },
         {"filepath": filepath},
     )
     return summary_file
@@ -171,6 +181,4 @@ def check_extension(filepath, extension):
     """Raise an error if filepath does not have specified extension."""
     name, ext = os.path.splitext(filepath)
     if ext != extension:
-        raise ValueError(
-            f"File {filepath} does not have extension '{extension}'."
-        )
+        raise ValueError(f"File {filepath} does not have extension '{extension}'.")

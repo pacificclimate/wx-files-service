@@ -35,13 +35,15 @@ def single_item_rep(file):
             "variables": file.variables,
             "anomaly": file.anomaly,
             "smoothing": file.smoothing,
+            "version": file.version,
         }
     elif file.fileType == "summary":
         return {
             **rep_common,
             # TODO: It is probably not right to fill these in statically.
             #  See TODO in ORM definition
-            "scenario": "RCP8.5",
+            "scenario": file.scenario,
+            "version": file.version,
             "ensembleStatistic": "multiple",
             "timePeriod": "all",
             "variables": "all thermodynamic",
