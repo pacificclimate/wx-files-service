@@ -21,5 +21,15 @@ This microservice provides
 
 ## Releasing
 
-TODO
+1. Increment `version` in `pyproject.toml`
 
+2. Summarize the changes since the last version in `NEWS.md`
+
+3. Commit these changes, then tag the release and push to github:
+
+```bash
+git add pyproject.toml NEWS.md
+git commit -m "Bump to version x.x.x"
+git tag -a -m "x.x.x" x.x.x
+git push --follow-tags
+```
