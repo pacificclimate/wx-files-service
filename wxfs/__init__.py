@@ -22,7 +22,7 @@ app_db = None
 
 def create_app(config_override={}):
     global connexion_app, flask_app, app_db
-    connexion_app = connexion.FlaskApp(__name__, specification_dir="openapi/")
+    connexion_app = connexion.App(__name__, specification_dir="openapi/")
 
     flask_app = connexion_app.app
     CORS(flask_app)
