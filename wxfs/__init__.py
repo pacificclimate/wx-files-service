@@ -2,6 +2,7 @@ import os
 import connexion
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from asgiref.wsgi import WsgiToAsgi
 
 # This is a nasty way to do this.
 #
@@ -22,10 +23,12 @@ app_db = None
 
 def create_app(config_override={}):
     global connexion_app, flask_app, app_db
+#    connexion_app = WsgiToAsgi(connexion.App(__name__, specification_dir="openapi/"))
     connexion_app = connexion.App(__name__, specification_dir="openapi/")
 
+
     flask_app = connexion_app.app
-    CORS(flask_app)
+    #CORS(flask_app)
 
     flask_app.config.from_mapping(
         SQLALCHEMY_DATABASE_URI=os.getenv("WXFS_DSN", ""),
