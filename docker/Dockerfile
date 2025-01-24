@@ -29,4 +29,4 @@ EXPOSE 8000
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-CMD poetry run uvicorn --port 8000 --host 0.0.0.0 --reload wxfs.asgi:connexion_app
+CMD poetry run uvicorn --port 8000 --host 0.0.0.0 --reload --log-level trace wxfs.asgi:connexion_app
