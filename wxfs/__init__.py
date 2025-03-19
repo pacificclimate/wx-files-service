@@ -32,6 +32,7 @@ def create_app(config_override={}):
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=False,
     )
+    flask_app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
     flask_app.config.update(config_override)
 
     app_db = SQLAlchemy(flask_app)
