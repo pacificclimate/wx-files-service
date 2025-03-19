@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 1.1.1
+*2025-Mar-19*
+
+- [Enable SQL Alchemy's pre-ping functionality for stability](https://github.com/pacificclimate/wx-files-service/pull/33)
+
 ## 1.1.0
 
 *2024-Dec-16*
