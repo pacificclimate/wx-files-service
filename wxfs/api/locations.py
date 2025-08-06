@@ -40,7 +40,15 @@ def collection_rep(locations):
     return [collection_item_rep(location) for location in locations]
 
 
+
 def listing():
+    """Return a list of all locations.
+    
+    Due to the potentially large number of locations, this function
+    memoizes the result after the first call to avoid repeated database queries.
+
+    TODO: Alternative strategies for caching may be preferable when more can be devoted to this app.
+    """
     if locations_memo is not None:
         return locations_memo 
     else:
@@ -52,3 +60,5 @@ def listing():
 def get(id=None):
     location = get_app_session().query(Location).filter_by(id=id).one()
     return single_item_rep(location)
+
+listing()  # Populate the memo on first access
