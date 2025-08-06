@@ -41,12 +41,12 @@ def collection_rep(locations):
 
 
 def listing():
-    locations = get_app_session().query(Location).order_by(Location.id.asc()).all()
-
-    return locations_memo if locations_memo is not None
-
-    locations_memo = collection_rep(locations)
-    return locations_memo;
+    if locations_memo is not None:
+        return locations_memo 
+    else:
+        locations = get_app_session().query(Location).order_by(Location.id.asc()).all()
+        locations_memo = collection_rep(locations)
+        return locations_memo
 
 
 def get(id=None):
