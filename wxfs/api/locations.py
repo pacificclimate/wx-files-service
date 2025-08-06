@@ -3,6 +3,7 @@ from wxfs.database import Location
 from wxfs import get_app_session
 from wxfs.api.files import collection_rep as files_collection_rep
 
+locations_memo = None
 
 def uri(location):
     return url_for(".wxfs_api_locations_get", id=location.id)
@@ -41,7 +42,11 @@ def collection_rep(locations):
 
 def listing():
     locations = get_app_session().query(Location).order_by(Location.id.asc()).all()
-    return collection_rep(locations)
+
+    return locations_memo if locations_memo is not None
+
+    locations_memo = collection_rep(locations)
+    return locations_memo;
 
 
 def get(id=None):
