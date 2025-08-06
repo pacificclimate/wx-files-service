@@ -1,5 +1,10 @@
 # News / Release Notes
 
+## 1.1.2
+
+- [Memoise locations call to improve initial load times](https://github.com/pacificclimate/wx-files-service/pull/37)
+
+
 ## 1.1.1
 *2025-Mar-19*
 
