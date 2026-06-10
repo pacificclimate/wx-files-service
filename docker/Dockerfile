@@ -1,34 +1,54 @@
-# Copied from station-data-portal-backend, which in turn was
-# adapted from weather-anomaly-data-service/Dockerfile and
-# climate-explorer-backend/docker/Dockerfile.dev
-# As always with docker, is there a better way to do this? Almost certainly.
-
-FROM ubuntu:22.04
-
-MAINTAINER Rod Glover <rglover@uvic.ca>
+FROM ubuntu:24.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get -yq install \
-        libpq-dev \
-        python3 \
-        python3-dev \
-        python3-pip \
-        postgresql-client \
-	wget
+    build-essential \
+    libpq-dev \
+    pipx \
+    python3 \
+    python3-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-ADD . /app
 WORKDIR /app
 
-RUN wget -O - https://install.python-poetry.org | python3 -
 ENV PATH=/root/.local/bin:$PATH
-RUN poetry install
+
+RUN pipx install poetry
+
+COPY pyproject.toml poetry.lock README.md ./
+COPY wxfs ./wxfs
+
+RUN poetry config virtualenvs.in-project true && \
+    poetry install --only main
+
+
+FROM ubuntu:24.04
+
+LABEL maintainer="PCIC DevOps <pcic.devops@uvic.ca>"
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get -yq install \
+    curl \
+    libpq5 \
+    python3 \
+    postgresql-client && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=builder /app /app
+
+ENV PATH=/app/.venv/bin:$PATH
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
 EXPOSE 8000
 
-ENV FLASK_APP wxfs.asgi
-ENV FLASK_ENV development
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/readyz || exit 1
 
-CMD poetry run uvicorn --port 8000 --host 0.0.0.0 --reload wxfs.asgi:connexion_app
+CMD ["uvicorn", "--port", "8000", "--host", "0.0.0.0", "wxfs.asgi:connexion_app"]
