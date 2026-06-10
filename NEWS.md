@@ -1,5 +1,9 @@
 # News / Release Notes
 
+## 1.2.0
+
+- [Maintenance upgrades, Connection pool customisation, readyz route](https://github.com/pacificclimate/wx-files-service/pull/38)
+
 ## 1.1.2
 
 - [Memoise locations call to improve initial load times](https://github.com/pacificclimate/wx-files-service/pull/37)
