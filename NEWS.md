@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 1.2.1
+
+*2026-Oct-29*
+
+- Rebuild the container with Ubuntu's patched Brotli package to address HTTP2Shell (CVE-2026-111497).
+
 ## 1.2.0
 
 - [Maintenance upgrades, Connection pool customisation, readyz route](https://github.com/pacificclimate/wx-files-service/pull/38)
