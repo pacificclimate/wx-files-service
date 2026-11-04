@@ -1,9 +1,11 @@
 import pytest
 
 import datetime
+from types import SimpleNamespace
+from unittest.mock import Mock
 
-from wxfs.indexer import index_wx_file
-from wxfs.database import Location, WxFile
+from wxfs.indexer import index_location, index_wx_file
+from wxfs.database import Location, SummaryFile, WxFile
 
 
 @pytest.mark.parametrize(
@@ -62,3 +64,110 @@ def test_index_many_wx_files(
 
     wx_file_q = db_session.query(WxFile)
     assert wx_file_q.count() == len(years)
+
+
+@pytest.fixture
+def memory_session():
+    """Exercise find_or_insert with stored objects and no database connection."""
+    records = []
+    session = Mock(spec=["query", "add"])
+    session.add.side_effect = records.append
+
+    def query(model):
+        def filter_by(**attributes):
+            return SimpleNamespace(
+                first=lambda: next(
+                    (
+                        record
+                        for record in records
+                        if isinstance(record, model)
+                        and all(
+                            getattr(record, key) == value
+                            for key, value in attributes.items()
+                        )
+                    ),
+                    None,
+                )
+            )
+
+        return SimpleNamespace(filter_by=filter_by)
+
+    session.query.side_effect = query
+    return session
+
+
+@pytest.fixture
+def ssp_summaries(tmp_path, make_wx_file):
+    summaries = {}
+    for suffix, scenario in [
+        ("SSP126", "SSP1-2.6"),
+        ("SSP245", "SSP2-4.5"),
+        ("SSP585", "SSP5-8.5"),
+    ]:
+        make_wx_file(
+            2050, "Anyville", "999999", 50.0, -124.5, 100.0,
+            scenario=suffix, format=2,
+        )
+        path = tmp_path / f"summary_{suffix}.xlsx"
+        path.touch()
+        summaries[str(path)] = scenario
+    return summaries
+
+
+def test_indexes_three_ssp_summaries(tmp_path, memory_session, ssp_summaries):
+    files = index_location(memory_session, "CMIP6", str(tmp_path))
+
+    summaries = [file for file in files if isinstance(file, SummaryFile)]
+    assert len(summaries) == 3
+    assert {file.filepath: file.scenario for file in summaries} == ssp_summaries
+    weather = [file for file in files if isinstance(file, WxFile)]
+    assert len(weather) == 3
+    assert all(file.location is weather[0].location for file in summaries)
+    assert all(file.version == "CMIP6" for file in summaries)
+
+
+@pytest.mark.parametrize(
+    "scenarios, expected",
+    [(["RCP85"], "RCP 8.5"), (["SSP126", "SSP585"], "multiple")],
+)
+def test_indexes_legacy_summary(
+    tmp_path, memory_session, make_wx_file, scenarios, expected
+):
+    for scenario in scenarios:
+        make_wx_file(
+            2050, "Anyville", "999999", 50.0, -124.5, 100.0,
+            scenario=scenario, format=2,
+        )
+    path = tmp_path / "summary.xlsx"
+    path.touch()
+
+    files = index_location(memory_session, "CMIP6", str(tmp_path))
+
+    summaries = [file for file in files if isinstance(file, SummaryFile)]
+    assert len(summaries) == 1
+    assert summaries[0].filepath == str(path)
+    assert summaries[0].scenario == expected
+
+
+@pytest.mark.parametrize(
+    "filenames",
+    [
+        ["summary_SSP999.xlsx"],
+        ["summary_SSP126.xlsx", "summary_SSP999.xlsx"],
+        ["summary_SSP126.xlsx", "summary.xlsx"],
+        ["summary_one.xlsx", "summary_two.xlsx"],
+    ],
+)
+def test_rejects_unrecognized_summary_scenarios(
+    tmp_path, memory_session, make_wx_file, filenames
+):
+    for scenario in ["SSP126", "SSP585"]:
+        make_wx_file(
+            2050, "Anyville", "999999", 50.0, -124.5, 100.0,
+            scenario=scenario, format=2,
+        )
+    for filename in filenames:
+        (tmp_path / filename).touch()
+
+    with pytest.raises(ValueError, match="Cannot determine scenario for summary file"):
+        index_location(memory_session, "CMIP6", str(tmp_path))
