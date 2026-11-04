@@ -70,7 +70,7 @@ def index_location(sesh, version, filepath):
     # We assume there are few (relevant) files in each directory, so that accumulating
     # all their paths is no big deal.
     wx_filepaths = []
-    summary_filepath = None
+    summary_filepaths = []
     for entry in os.scandir(filepath):
         path = entry.path
         name, extension = os.path.splitext(path)
@@ -82,7 +82,7 @@ def index_location(sesh, version, filepath):
                 wx_filepaths.append(path)
             elif extension == summary_file_extension:
                 logger.debug(f"Found summary file {path}")
-                summary_filepath = path
+                summary_filepaths.append(path)
             else:
                 logger.debug(f"Found unknown type of file {path}")
 
@@ -106,9 +106,27 @@ def index_location(sesh, version, filepath):
         if not all(file.location == location for file in files):
             # Does this need to be pre-checked before doing any database activities?
             logger.warning("Shit, locations aren't all the same.")
-        if summary_filepath is not None:
+        summary_scenarios = {
+            "SSP126": "SSP1-2.6",
+            "SSP245": "SSP2-4.5",
+            "SSP585": "SSP5-8.5",
+        }
+        for summary_filepath in summary_filepaths:
+            name, _ = os.path.splitext(os.path.basename(summary_filepath))
+            suffix = name.rsplit("_", 1)[-1]
+            if suffix in summary_scenarios:
+                summary_scenario = summary_scenarios[suffix]
+            elif len(summary_filepaths) == 1 and not suffix.upper().startswith("SSP"):
+                summary_scenario = scenario
+            else:
+                raise ValueError(
+                    f"Cannot determine scenario for summary file {summary_filepath}: "
+                    "expected _SSP126.xlsx, _SSP245.xlsx, or _SSP585.xlsx"
+                )
             files.append(
-                index_summary_file(sesh, location, scenario, version, summary_filepath)
+                index_summary_file(
+                    sesh, location, summary_scenario, version, summary_filepath
+                )
             )
     else:
         logger.info(f"{filepath} does not contain any recognized files")

@@ -95,6 +95,13 @@ like this:
 The indexing scripts are installed by the project and can be used directly
 from the command line.
 
+A location directory may contain scenario-specific summary files named with the
+suffixes `_SSP126.xlsx`, `_SSP245.xlsx`, and `_SSP585.xlsx`, indexed as `SSP1-2.6`,
+`SSP2-4.5`, and `SSP5-8.5`, respectively. A legacy single summary without an SSP
+suffix continues to use the scenario summarized from the location's EPW files.
+Unsupported SSP suffixes, or unrecognized suffixes when multiple summaries are
+present, raise an error instead of falling back to the EPW scenarios.
+
 ### All files in a master directory
 
 Typically, all the files to be indexed are under a single root 
